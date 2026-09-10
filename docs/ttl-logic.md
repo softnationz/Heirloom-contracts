@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethos-Protocol uses Stellar's Time-to-Live (TTL) and state archival features to automate inheritance without manual intervention.
+Heirloom-Protocol uses Stellar's Time-to-Live (TTL) and state archival features to automate inheritance without manual intervention.
 
 ## How TTL Works
 
@@ -35,7 +35,7 @@ pub fn is_expired(env: Env, vault_id: u64) -> bool {
 
 ## State Archival
 
-Soroban archives inactive contract state to reduce costs. Ethos-Protocol extends TTL on:
+Soroban archives inactive contract state to reduce costs. Heirloom-Protocol extends TTL on:
 - Vault creation
 - Check-ins
 - Deposits

@@ -1,6 +1,6 @@
 # Disaster Recovery Runbook
 
-This runbook covers emergency procedures for Ethos-Protocol operators. Follow each section in order during an incident.
+This runbook covers emergency procedures for Heirloom-Protocol operators. Follow each section in order during an incident.
 
 ---
 
@@ -158,7 +158,7 @@ If the current admin key is already compromised and cannot sign, the contract mu
 | Role | Contact | When to Escalate |
 |------|---------|-----------------|
 | On-call operator | Internal team channel | Any P0/P1 incident |
-| Security team | security@ethos-protocol.example.com | Suspected exploit or key compromise |
+| Security team | security@heirloom-protocol.example.com | Suspected exploit or key compromise |
 | Stellar SDF support | https://stellar.org/developers | Ledger-level or network issues |
 | External auditor | (contract-specific contact) | Unresolved critical findings |
 
@@ -170,25 +170,25 @@ Escalate to the next level if no response within 30 minutes for P0 incidents.
 
 ### Planned Maintenance
 
-> **[Ethos-Protocol] Scheduled Maintenance — [DATE] [TIME] UTC**
+> **[Heirloom-Protocol] Scheduled Maintenance — [DATE] [TIME] UTC**
 >
-> We will be performing scheduled maintenance on the Ethos-Protocol contract. During this window, vault operations (deposit, withdraw, check-in, release) will be temporarily unavailable.
+> We will be performing scheduled maintenance on the Heirloom-Protocol contract. During this window, vault operations (deposit, withdraw, check-in, release) will be temporarily unavailable.
 >
 > Expected duration: [DURATION]
 > Your vault state and funds are safe and will be fully accessible after maintenance.
 
 ### Unplanned Outage
 
-> **[Ethos-Protocol] Service Disruption — [DATE] [TIME] UTC**
+> **[Heirloom-Protocol] Service Disruption — [DATE] [TIME] UTC**
 >
 > We are currently investigating an issue affecting vault operations. As a precaution, the contract has been paused to protect user funds.
 >
 > No funds have been lost. We will provide an update within [TIMEFRAME].
-> For urgent inquiries: security@ethos-protocol.example.com
+> For urgent inquiries: security@heirloom-protocol.example.com
 
 ### All-Clear
 
-> **[Ethos-Protocol] Service Restored — [DATE] [TIME] UTC**
+> **[Heirloom-Protocol] Service Restored — [DATE] [TIME] UTC**
 >
 > The issue has been resolved and the contract is fully operational. All vault operations are available.
 >

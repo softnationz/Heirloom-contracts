@@ -1,6 +1,6 @@
-# Ethos-Protocol Backend API Reference
+# Heirloom-Protocol Backend API Reference
 
-This document provides a comprehensive reference for the Ethos-Protocol backend server endpoints. The backend is a Rust-based Axum web service that manages reminder preferences, notifications, and system health checks for vault owners.
+This document provides a comprehensive reference for the Heirloom-Protocol backend server endpoints. The backend is a Rust-based Axum web service that manages reminder preferences, notifications, and system health checks for vault owners.
 
 ---
 
@@ -475,7 +475,7 @@ By default, the backend uses an in-memory SQLite database (`:memory:`), which is
 **For persistent storage**, set:
 
 ```bash
-export DATABASE_URL="/path/to/ethos-protocol.db"
+export DATABASE_URL="/path/to/heirloom-protocol.db"
 ```
 
 ### Health Checks

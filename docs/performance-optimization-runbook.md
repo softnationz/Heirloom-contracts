@@ -2,7 +2,7 @@
 
 ## Overview
 
-This runbook guides engineers through systematic performance analysis, bottleneck identification, and optimization of the Ethos-Protocol backend. Follow these steps in order — measure first, optimize second.
+This runbook guides engineers through systematic performance analysis, bottleneck identification, and optimization of the Heirloom-Protocol backend. Follow these steps in order — measure first, optimize second.
 
 ---
 
@@ -20,7 +20,7 @@ curl -s http://localhost:3000/metrics > baseline_metrics.txt
 wrk -t4 -c50 -d60s http://localhost:3000/health > baseline_load.txt
 
 # Check active connections and memory
-ps aux | grep ethos-protocol-backend
+ps aux | grep heirloom-protocol-backend
 ```
 
 Record:
@@ -49,7 +49,7 @@ Enable request tracing for the slow path using the sampling configuration:
 TRACE_SAMPLE_RATE=1.0 cargo run --release
 
 # Or set adaptive sampling to always-on for a short window
-TRACE_ADAPTIVE=false TRACE_SAMPLE_RATE=1.0 ./target/release/ethos-protocol-backend
+TRACE_ADAPTIVE=false TRACE_SAMPLE_RATE=1.0 ./target/release/heirloom-protocol-backend
 ```
 
 Check logs for `tower_http::trace` spans with high `latency_ms` values.
@@ -102,15 +102,15 @@ The RPC connection pool (`RpcPool`) exposes metrics for diagnosing outbound bott
 
 ```bash
 # Monitor pool metrics in real time
-watch -n1 "curl -s http://localhost:3000/metrics | grep ethos_rpc"
+watch -n1 "curl -s http://localhost:3000/metrics | grep heirloom_rpc"
 ```
 
 Key metrics:
 
 | Metric | High value means |
 |---|---|
-| `ethos_rpc_pool_errors_total` rising | RPC endpoint instability |
-| `ethos_rpc_pool_health_check_failures_total` rising | Network or DNS issue |
+| `heirloom_rpc_pool_errors_total` rising | RPC endpoint instability |
+| `heirloom_rpc_pool_health_check_failures_total` rising | Network or DNS issue |
 | Response time p99 > 2 s | RPC endpoint overloaded; consider retry with backoff |
 
 Tune the pool via environment variables:
@@ -127,10 +127,10 @@ If clients send large gzip-compressed bodies, the decompression step can add CPU
 
 ```bash
 # Check decompression config
-grep DECOMP /etc/ethos-protocol/env  # or wherever env vars are set
+grep DECOMP /etc/heirloom-protocol/env  # or wherever env vars are set
 
 # Profile decompression CPU time under load
-perf stat -e cpu-cycles ./target/release/ethos-protocol-backend &
+perf stat -e cpu-cycles ./target/release/heirloom-protocol-backend &
 wrk -t4 -c20 -d30s -s scripts/wrk_gzip_body.lua http://localhost:3000/api/vaults
 ```
 
@@ -145,7 +145,7 @@ Full tracing at high RPS adds meaningful CPU cost. Use adaptive sampling in prod
 
 ```bash
 # Check current sample rate in metrics
-curl -s http://localhost:3000/metrics | grep ethos_trace_effective_sample_rate
+curl -s http://localhost:3000/metrics | grep heirloom_trace_effective_sample_rate
 ```
 
 Recommended production settings:
@@ -216,13 +216,13 @@ The default Tokio multi-thread scheduler works well in most cases. For CPU-bound
 
 ```bash
 # Match worker threads to physical cores (default: logical cores)
-TOKIO_WORKER_THREADS=4 ./target/release/ethos-protocol-backend
+TOKIO_WORKER_THREADS=4 ./target/release/heirloom-protocol-backend
 ```
 
 For I/O-bound workloads (many concurrent RPC calls), more threads are beneficial:
 
 ```bash
-TOKIO_WORKER_THREADS=16 ./target/release/ethos-protocol-backend
+TOKIO_WORKER_THREADS=16 ./target/release/heirloom-protocol-backend
 ```
 
 ### 3.6 Enable Release Optimizations
@@ -287,7 +287,7 @@ Use this checklist before declaring a performance investigation complete.
 - [ ] Tracing enabled for the slow path (`TRACE_SAMPLE_RATE=1.0` temporarily)
 - [ ] Profiler or flamegraph run to identify hot functions
 - [ ] Database busy-timeout count checked
-- [ ] RPC pool metrics inspected (`ethos_rpc_pool_*`)
+- [ ] RPC pool metrics inspected (`heirloom_rpc_pool_*`)
 
 ### Optimization
 
@@ -339,6 +339,6 @@ All performance-related knobs in one place:
 - [Tower HTTP Middleware](https://docs.rs/tower-http)
 - [reqwest Connection Pooling](https://docs.rs/reqwest/latest/reqwest/struct.ClientBuilder.html#method.pool_max_idle_per_host)
 - [SQLite WAL Mode](https://www.sqlite.org/wal.html)
-- [Ethos-Protocol Benchmarking Guide](benchmarking-guide.md)
-- [Ethos-Protocol Monitoring Guide](monitoring-guide.md)
+- [Heirloom-Protocol Benchmarking Guide](benchmarking-guide.md)
+- [Heirloom-Protocol Monitoring Guide](monitoring-guide.md)
 - [Disaster Recovery Runbook](disaster-recovery-runbook.md)

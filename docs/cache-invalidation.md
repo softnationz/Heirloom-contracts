@@ -49,7 +49,7 @@ VaultStateChanged("vault_001")
 Use `CacheEventEmitter` to emit events from application code:
 
 ```rust
-use ethos_protocol_backend::cache_invalidation::{CacheEventEmitter, CacheInvalidator};
+use heirloom_protocol_backend::cache_invalidation::{CacheEventEmitter, CacheInvalidator};
 use std::sync::Arc;
 
 let invalidator = Arc::new(CacheInvalidator::new(Arc::clone(&cache)));
@@ -74,7 +74,7 @@ emitter.global_flush();
 ### Direct Event Handling
 
 ```rust
-use ethos_protocol_backend::cache_invalidation::{CacheEvent, CacheInvalidator};
+use heirloom_protocol_backend::cache_invalidation::{CacheEvent, CacheInvalidator};
 
 let invalidator = CacheInvalidator::new(Arc::clone(&cache));
 
@@ -88,7 +88,7 @@ invalidator.handle_event(CacheEvent::VaultStateChanged {
 Register that a computed cache entry depends on a vault:
 
 ```rust
-use ethos_protocol_backend::cache_invalidation::CacheKey;
+use heirloom_protocol_backend::cache_invalidation::CacheKey;
 
 // When caching a derived summary, register its dependency
 invalidator.register_dependency("vault_001", CacheKey::Summary);

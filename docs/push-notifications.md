@@ -1,6 +1,6 @@
 # Push Notification Setup
 
-Ethos-Protocol uses **Firebase Cloud Messaging (FCM) HTTP v1 API** to deliver push notifications to iOS, Android, and web clients.
+Heirloom-Protocol uses **Firebase Cloud Messaging (FCM) HTTP v1 API** to deliver push notifications to iOS, Android, and web clients.
 
 ## Environment Variables
 

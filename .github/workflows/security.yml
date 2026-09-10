@@ -15,8 +15,15 @@ env:
 
 jobs:
   vulnerability-scan:
-    name: Vulnerability Scan
+    name: Vulnerability Scan (${{ matrix.workspace }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [contracts, backend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.workspace }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,8 +37,8 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-audit-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-audit-
+          key: ${{ runner.os }}-cargo-audit-${{ matrix.workspace }}-${{ hashFiles(format('{0}/Cargo.lock', matrix.workspace)) }}
+          restore-keys: ${{ runner.os }}-cargo-audit-${{ matrix.workspace }}-
 
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked
@@ -49,15 +56,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: audit-report
-          path: audit-report.json
+          name: audit-report-${{ matrix.workspace }}
+          path: ${{ matrix.workspace }}/audit-report.json
           retention-days: 30
 
       - name: Install cargo-deny
         run: cargo install cargo-deny --locked
 
       - name: Run cargo-deny license and advisory check
-        run: cargo deny check advisories licenses
+        # deny.toml lives at the repo root and is shared by both workspaces.
+        run: cargo deny --manifest-path Cargo.toml check --config ../deny.toml advisories licenses
 
   dependency-review:
     name: Dependency Review

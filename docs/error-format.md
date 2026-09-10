@@ -25,7 +25,7 @@ existing `ApiError`/`AppError` types in `backend/src/error.rs`.
       "tenant_id": "tenant-1",
       "roles": ["admin"]
     },
-    "stack_trace": "0: ethos_protocol_backend::handlers::...\n..."
+    "stack_trace": "0: heirloom_protocol_backend::handlers::...\n..."
   }
 }
 ```
@@ -60,7 +60,7 @@ the extra detail is worth the cost; skip it for expected 4xx errors like
 ## Usage
 
 ```rust
-use ethos_protocol_backend::error_context::{ErrorContext, EnrichExt};
+use heirloom_protocol_backend::error_context::{ErrorContext, EnrichExt};
 
 async fn handler(request: Request /* or headers */) -> Result<Json<T>, EnrichedError> {
     let ctx = ErrorContext::from_request(&request).capture_stack_trace();

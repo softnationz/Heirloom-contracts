@@ -1,12 +1,12 @@
 openapi: 3.1.0
 info:
-  title: Ethos-Protocol Backend API
+  title: Heirloom-Protocol Backend API
   description: >
-    Backend API for Ethos-Protocol, a decentralized "Dead Man's Switch" built on Stellar/Soroban.
+    Backend API for Heirloom-Protocol, a decentralized "Dead Man's Switch" built on Stellar/Soroban.
     This API provides endpoints for vault management, reminder preferences, notifications, and administrative operations.
   version: 1.0.0
   contact:
-    name: Ethos-Protocol Team
+    name: Heirloom-Protocol Team
     url: https://github.com/Ethos-Protocol/Ethos-Protocol
   license:
     name: MIT

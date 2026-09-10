@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethos-Protocol includes integration tests that verify contract behavior on Stellar testnet. These tests validate real-world scenarios including network latency, token transfers, and multi-step workflows.
+Heirloom-Protocol includes integration tests that verify contract behavior on Stellar testnet. These tests validate real-world scenarios including network latency, token transfers, and multi-step workflows.
 
 ## Prerequisites
 

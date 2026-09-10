@@ -1,10 +1,10 @@
 # Token Management Features
 
-This document describes the token management features implemented in Ethos-Protocol, including token conversion, staking, yield distribution, lending, collateral, hedging, and rebalancing.
+This document describes the token management features implemented in Heirloom-Protocol, including token conversion, staking, yield distribution, lending, collateral, hedging, and rebalancing.
 
 ## Overview
 
-Ethos-Protocol now supports advanced token management capabilities that allow vault owners to:
+Heirloom-Protocol now supports advanced token management capabilities that allow vault owners to:
 
 1. **Convert tokens** before release (Issue #581)
 2. **Validate token whitelisting** in batch operations (Issue #582)
@@ -17,7 +17,7 @@ Ethos-Protocol now supports advanced token management capabilities that allow va
 
 ## Fee Calculation
 
-This section explains how various fees are calculated in Ethos-Protocol token management operations, enabling users to predict transaction costs and understand fee distribution.
+This section explains how various fees are calculated in Heirloom-Protocol token management operations, enabling users to predict transaction costs and understand fee distribution.
 
 ### Swap Fees
 
@@ -268,7 +268,7 @@ Rebalancing fee = ($1,200 * 40) / 10000 = $4.80 (or ~24 XLM)
 
 ### Gas Fee Considerations
 
-Smart contract operations incur Stellar network fees in addition to Ethos-Protocol fees.
+Smart contract operations incur Stellar network fees in addition to Heirloom-Protocol fees.
 
 **Typical Gas Costs (XLM):**
 - Simple transfer: 0.00001 XLM (1 stroops)
@@ -295,7 +295,7 @@ Protocol fees may be adjusted by governance. Upcoming changes include:
 - Fee reductions during low-activity periods
 
 **Monitoring Fee Changes:**
-Subscribe to Ethos-Protocol notifications for protocol updates affecting fees.
+Subscribe to Heirloom-Protocol notifications for protocol updates affecting fees.
 
 ## Issue #581: Token Conversion
 

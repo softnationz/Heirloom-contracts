@@ -1,6 +1,6 @@
 # Architecture Diagrams and Visual Guides
 
-This document provides a complete visual reference for the Ethos-Protocol system. All diagrams use [Mermaid](https://mermaid.js.org/) syntax and render natively in GitHub, GitLab, VS Code (with the Markdown Preview Mermaid Support extension), and most modern documentation platforms.
+This document provides a complete visual reference for the Heirloom-Protocol system. All diagrams use [Mermaid](https://mermaid.js.org/) syntax and render natively in GitHub, GitLab, VS Code (with the Markdown Preview Mermaid Support extension), and most modern documentation platforms.
 
 ## Table of Contents
 

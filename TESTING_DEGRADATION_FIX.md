@@ -7,7 +7,7 @@ The implementation includes comprehensive unit tests to verify the fix works cor
 ### Running Tests
 
 ```bash
-cd /workspaces/ethos-contracts-backend
+cd /workspaces/heirloom-contracts-backend
 cargo test --package backend --lib degradation -- --nocapture
 ```
 
@@ -85,7 +85,7 @@ cargo test --package backend --lib degradation::tests::test_list_returns_all_reg
 ### Setup
 
 ```bash
-cd /workspaces/ethos-contracts-backend
+cd /workspaces/heirloom-contracts-backend
 cp .env.example .env
 # Edit .env with appropriate values if needed
 docker-compose up -d
@@ -156,7 +156,7 @@ This test verifies that the fix works as intended: all instances see the same de
 
 ```bash
 # Terminal 1: Start first backend instance on port 3000
-cd /workspaces/ethos-contracts-backend
+cd /workspaces/heirloom-contracts-backend
 cargo run --package backend
 
 # Terminal 2: Start second backend instance on port 3001
@@ -255,7 +255,7 @@ curl http://localhost:3000/admin/capabilities
 # Step 3: Kill the backend process (Ctrl+C)
 
 # Step 4: Restart the backend process
-cd /workspaces/ethos-contracts-backend
+cd /workspaces/heirloom-contracts-backend
 cargo run --package backend
 
 # Step 5: Verify capability status persisted

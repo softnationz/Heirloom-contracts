@@ -1,4 +1,4 @@
-# Contributing to Ethos-Protocol
+# Contributing to Heirloom-Protocol
 
 We welcome contributions! Please follow these guidelines to help us maintain project quality.
 

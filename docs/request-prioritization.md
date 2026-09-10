@@ -1,6 +1,6 @@
 # Request Prioritization
 
-Ethos-Protocol backend requests previously had equal standing, so a burst of
+Heirloom-Protocol backend requests previously had equal standing, so a burst of
 low-value traffic could starve critical-path requests (vault release checks,
 webhook delivery retries) of capacity. Clients can now declare relative
 importance per-request, and the server enforces per-priority concurrency

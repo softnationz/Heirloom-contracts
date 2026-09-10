@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethos-Protocol uses Passkeys (WebAuthn) for authentication, eliminating seed phrase management.
+Heirloom-Protocol uses Passkeys (WebAuthn) for authentication, eliminating seed phrase management.
 
 ## Why Passkeys?
 
@@ -32,7 +32,7 @@ Passkey integration is planned for v2.0. Current implementation uses standard St
 
 ## Biometric Verification
 
-Ethos-Protocol supports biometric verification (fingerprint, face) as an enhanced check-in mechanism. Biometric credentials are stored as SHA-256 hash commitments — the raw biometric data never leaves the device.
+Heirloom-Protocol supports biometric verification (fingerprint, face) as an enhanced check-in mechanism. Biometric credentials are stored as SHA-256 hash commitments — the raw biometric data never leaves the device.
 
 ### How It Works
 

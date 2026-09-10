@@ -20,21 +20,21 @@
 
 ## General
 
-### What is Ethos-Protocol?
+### What is Heirloom-Protocol?
 
-Ethos-Protocol is a decentralized "Dead Man's Switch" built on Stellar/Soroban smart contracts. It lets you deposit funds into a vault that automatically releases to a designated beneficiary if you fail to periodically check in. It is designed for digital inheritance without lawyers, seed phrases, or trusted intermediaries.
+Heirloom-Protocol is a decentralized "Dead Man's Switch" built on Stellar/Soroban smart contracts. It lets you deposit funds into a vault that automatically releases to a designated beneficiary if you fail to periodically check in. It is designed for digital inheritance without lawyers, seed phrases, or trusted intermediaries.
 
 See the [README](../README.md) for a complete overview.
 
-### What problem does Ethos-Protocol solve?
+### What problem does Heirloom-Protocol solve?
 
-Over $140 billion in crypto assets are estimated to be permanently lost because wallet owners become unable to pass on access. Ethos-Protocol solves this by using Stellar's native TTL (Time-to-Live) mechanics as an automated inheritance trigger — no executor required.
+Over $140 billion in crypto assets are estimated to be permanently lost because wallet owners become unable to pass on access. Heirloom-Protocol solves this by using Stellar's native TTL (Time-to-Live) mechanics as an automated inheritance trigger — no executor required.
 
-### Is Ethos-Protocol audited?
+### Is Heirloom-Protocol audited?
 
 Not yet. The codebase has not undergone a formal third-party security audit. Community review is welcome. See [docs/security.md](security.md) and [docs/security-audit-checklist.md](security-audit-checklist.md) for the current threat model and checklist.
 
-### What networks does Ethos-Protocol support?
+### What networks does Heirloom-Protocol support?
 
 | Network | Purpose |
 |---|---|
@@ -231,7 +231,7 @@ Yes. There is a 24-hour grace period during which unauthorized withdrawals can b
 
 ## Passkey and Authentication
 
-### What are Passkeys and why does Ethos use them?
+### What are Passkeys and why does Heirloom use them?
 
 Passkeys (WebAuthn) replace seed phrases with biometric authentication — fingerprint, Face ID, or hardware security key. They are phishing-resistant and hardware-backed. No seed phrase exposure means no single point of failure.
 

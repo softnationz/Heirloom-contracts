@@ -22,7 +22,7 @@ key under the tenant's ID (`tenant_id:key`).
 
 ```rust
 use std::time::Duration;
-use ethos_protocol_backend::cache_partition::PartitionedCache;
+use heirloom_protocol_backend::cache_partition::PartitionedCache;
 
 let cache = PartitionedCache::new(Duration::from_secs(300));
 
@@ -68,7 +68,7 @@ failure events, and supports full cache rebuilds.
 ### Usage
 
 ```rust
-use ethos_protocol_backend::cache_recovery::{FaultTolerantCache, CacheHealth};
+use heirloom_protocol_backend::cache_recovery::{FaultTolerantCache, CacheHealth};
 
 let cache: FaultTolerantCache<String> = FaultTolerantCache::new(100);
 
@@ -142,7 +142,7 @@ response.
 ### Usage
 
 ```rust
-use ethos_protocol_backend::cache_metrics::CacheMetrics;
+use heirloom_protocol_backend::cache_metrics::CacheMetrics;
 use std::time::{Duration, Instant};
 
 let metrics = CacheMetrics::new(10_000); // eviction window capacity
@@ -186,7 +186,7 @@ the endpoint configuration.
 
 ```rust
 use std::time::Duration;
-use ethos_protocol_backend::rate_limit::{
+use heirloom_protocol_backend::rate_limit::{
     EndpointConfig, RateLimiter, TierLimit, UserTier,
 };
 

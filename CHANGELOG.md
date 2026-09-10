@@ -7,5 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-06-30
 ### Added
-- Initial release of Ethos-Protocol contract.
+- Initial release of Heirloom-Protocol contract.
 - Added versioning policy and CHANGELOG.md.

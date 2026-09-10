@@ -166,7 +166,7 @@ and `MessageConsumer` wrappers do not need to change.
 ## Running the tests
 
 ```bash
-cargo test -p ethos-protocol-backend message_queue
+cargo test -p heirloom-protocol-backend message_queue
 ```
 
 All tests live in the `tests` module at the bottom of `message_queue.rs`.

@@ -1,6 +1,6 @@
 # Video Tutorials for Key Features
 
-This document describes the video tutorial series for Ethos-Protocol. Each tutorial maps to a specific feature or workflow. Tutorials are organized by audience level and include outlines, key talking points, and links to the matching written documentation.
+This document describes the video tutorial series for Heirloom-Protocol. Each tutorial maps to a specific feature or workflow. Tutorials are organized by audience level and include outlines, key talking points, and links to the matching written documentation.
 
 ## Table of Contents
 
@@ -53,7 +53,7 @@ All tutorials follow a consistent format:
 
 ### T-101 · Environment Setup and Local Development
 
-**Audience**: Developers new to Ethos-Protocol  
+**Audience**: Developers new to Heirloom-Protocol  
 **Duration**: ~12 minutes  
 **Written reference**: [README.md Quick Start](../README.md#-quick-start), [docs/deployment-guide.md](deployment-guide.md)
 
@@ -252,7 +252,7 @@ All tutorials follow a consistent format:
 
 **Outline**:
 
-1. What Passkeys are and why Ethos uses them instead of seed phrases
+1. What Passkeys are and why Heirloom uses them instead of seed phrases
 2. Current status: WebAuthn planned for v2.0; current auth via Stellar address
 3. Registering a biometric credential: `bind_passkey_biometric`
 4. Performing a biometric check-in: `biometric_check_in`

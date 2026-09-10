@@ -44,7 +44,7 @@ Literal length = L + 1
 Repeat length  = R + 3
 ```
 
-The extension type `0x45` identifies Ethos credential metadata. Ext8 is used
+The extension type `0x45` identifies Heirloom credential metadata. Ext8 is used
 for payloads up to 255 bytes; larger payloads use Ext16.
 
 ### API

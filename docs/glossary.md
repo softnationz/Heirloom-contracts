@@ -1,6 +1,6 @@
 # Glossary and Terminology Guide
 
-This glossary defines terms used throughout Ethos-Protocol documentation, code, and communications. Entries include definitions, context, cross-references, and pronunciation guidance where applicable.
+This glossary defines terms used throughout Heirloom-Protocol documentation, code, and communications. Entries include definitions, context, cross-references, and pronunciation guidance where applicable.
 
 ## How to Use This Glossary
 
@@ -38,13 +38,13 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### Dead Man's Switch
 
-**Definition**: A mechanism that activates automatically when a person fails to perform a periodic action (proving they are alive). In Ethos-Protocol, the switch fires when a **Vault Owner** stops **checking in**, releasing vault funds to the **Beneficiary**.
+**Definition**: A mechanism that activates automatically when a person fails to perform a periodic action (proving they are alive). In Heirloom-Protocol, the switch fires when a **Vault Owner** stops **checking in**, releasing vault funds to the **Beneficiary**.
 
 **Pronunciation**: *ded man's switch*
 
 **Usage**: "The vault acts as a dead man's switch — if the owner doesn't check in, funds are released automatically."
 
-**Context**: The term originates from railway safety systems where a train's brakes would engage if the operator released a foot pedal. Ethos-Protocol adapts this concept for digital asset inheritance.
+**Context**: The term originates from railway safety systems where a train's brakes would engage if the operator released a foot pedal. Heirloom-Protocol adapts this concept for digital asset inheritance.
 
 ---
 
@@ -112,7 +112,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### Soroban
 
-**Definition**: The smart contract platform built on the Stellar network. Ethos-Protocol's core vault logic is implemented as Soroban smart contracts written in Rust.
+**Definition**: The smart contract platform built on the Stellar network. Heirloom-Protocol's core vault logic is implemented as Soroban smart contracts written in Rust.
 
 **Pronunciation**: *so-ROH-ban*
 
@@ -128,7 +128,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 **Usage**: "If the owner stops all activity, the vault's persistent storage entry will eventually be archived."
 
-**Context**: State archival does not delete data — archived entries remain recoverable. Ethos-Protocol extends TTL on vault creation, check-ins, deposits, and withdrawals to prevent archival.
+**Context**: State archival does not delete data — archived entries remain recoverable. Heirloom-Protocol extends TTL on vault creation, check-ins, deposits, and withdrawals to prevent archival.
 
 **Related**: [TTL & State Archival Logic](ttl-logic.md)
 
@@ -152,13 +152,13 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 **Usage**: "A deposit of 100 XLM equals `1_000_000_000` stroops in contract parameters."
 
-**Context**: All balance values in Ethos-Protocol smart contracts use stroops (`i128`).
+**Context**: All balance values in Heirloom-Protocol smart contracts use stroops (`i128`).
 
 ---
 
 ### TTL (Time to Live)
 
-**Definition**: In the Soroban context, TTL refers to the number of **ledger** seconds a stored entry remains in the active (non-archived) state before being subject to **State Archival**. In Ethos-Protocol, TTL also informally refers to the countdown before a **Vault** expires and funds are released.
+**Definition**: In the Soroban context, TTL refers to the number of **ledger** seconds a stored entry remains in the active (non-archived) state before being subject to **State Archival**. In Heirloom-Protocol, TTL also informally refers to the countdown before a **Vault** expires and funds are released.
 
 **Pronunciation**: *T-T-L* (spelled out)
 
@@ -172,7 +172,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### XLM
 
-**Definition**: The native cryptocurrency of the Stellar network, used for transaction fees and as the primary asset type in Ethos-Protocol vaults.
+**Definition**: The native cryptocurrency of the Stellar network, used for transaction fees and as the primary asset type in Heirloom-Protocol vaults.
 
 **Pronunciation**: *X-L-M* (spelled out) or *Lumens*
 
@@ -212,7 +212,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### ContractError
 
-**Definition**: The enumerated error type returned by Ethos-Protocol smart contract functions when an operation fails. Each error has a unique numeric code.
+**Definition**: The enumerated error type returned by Heirloom-Protocol smart contract functions when an operation fails. Each error has a unique numeric code.
 
 **Usage**: "The function returned `ContractError::NotExpired` (2) because the TTL had not elapsed."
 
@@ -270,7 +270,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### Passkey
 
-**Definition**: A cryptographic credential based on the **WebAuthn** standard, stored on a user's device (phone, laptop, security key). Used in Ethos-Protocol to authenticate vault owner actions without exposing a seed phrase.
+**Definition**: A cryptographic credential based on the **WebAuthn** standard, stored on a user's device (phone, laptop, security key). Used in Heirloom-Protocol to authenticate vault owner actions without exposing a seed phrase.
 
 **Usage**: "The owner authenticated the check-in using a Passkey stored on their phone."
 
@@ -286,7 +286,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### Relying Party (RP)
 
-**Definition**: In the **WebAuthn** specification, the Relying Party is the server-side application that verifies Passkey credentials. In Ethos-Protocol, the backend acts as the RP.
+**Definition**: In the **WebAuthn** specification, the Relying Party is the server-side application that verifies Passkey credentials. In Heirloom-Protocol, the backend acts as the RP.
 
 **Abbreviation**: RP
 
@@ -298,7 +298,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### WebAuthn
 
-**Definition**: A W3C web standard for Passkey-based authentication. Ethos-Protocol uses WebAuthn as the sole authentication mechanism for vault operations, eliminating the need for seed phrases.
+**Definition**: A W3C web standard for Passkey-based authentication. Heirloom-Protocol uses WebAuthn as the sole authentication mechanism for vault operations, eliminating the need for seed phrases.
 
 **Pronunciation**: *web-AW-then*
 
@@ -312,7 +312,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### Scheduler
 
-**Definition**: A background process in the Ethos-Protocol backend that periodically checks vault TTL status and dispatches **Reminder Notifications** to owners approaching their check-in deadline.
+**Definition**: A background process in the Heirloom-Protocol backend that periodically checks vault TTL status and dispatches **Reminder Notifications** to owners approaching their check-in deadline.
 
 **Related**: [Monitoring Guide](monitoring-guide.md)
 
@@ -336,7 +336,7 @@ This glossary defines terms used throughout Ethos-Protocol documentation, code, 
 
 ### SBT (Soulbound Token)
 
-**Definition**: A non-transferable token on Stellar that represents a persistent, identity-linked credential. Ethos-Protocol uses SBTs for beneficiary proof-of-life and verification.
+**Definition**: A non-transferable token on Stellar that represents a persistent, identity-linked credential. Heirloom-Protocol uses SBTs for beneficiary proof-of-life and verification.
 
 **Pronunciation**: *S-B-T* (spelled out)
 

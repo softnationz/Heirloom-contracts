@@ -1,6 +1,6 @@
 # Secret Scanning
 
-Ethos-Protocol uses [gitleaks](https://github.com/gitleaks/gitleaks) to automatically scan for secrets (API keys, tokens, private keys, passwords, etc.) at two points in the development workflow: locally before every commit, and in CI before any code reaches `main`.
+Heirloom-Protocol uses [gitleaks](https://github.com/gitleaks/gitleaks) to automatically scan for secrets (API keys, tokens, private keys, passwords, etc.) at two points in the development workflow: locally before every commit, and in CI before any code reaches `main`.
 
 ---
 

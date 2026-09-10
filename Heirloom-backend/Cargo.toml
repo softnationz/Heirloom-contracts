@@ -1,0 +1,134 @@
+# The backend is its own standalone Cargo workspace (single member: this crate).
+# The on-chain contracts live in ../contracts and build as a separate workspace;
+# nothing here depends on soroban-sdk. See ../REPO_LAYOUT.md.
+[workspace]
+
+[workspace.package]
+license = "MIT"
+
+[workspace.lints.clippy]
+# Mirrors ../contracts/Cargo.toml so `cargo clippy -- -D warnings` behaves the
+# same on both sides of the split.
+pedantic = { level = "warn", priority = -1 }
+
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+needless_pass_by_value = "allow"
+return_self_not_must_use = "allow"
+too_many_arguments = "allow"
+too_many_lines = "allow"
+unused_self = "allow"
+
+cast_possible_truncation = "allow"
+cast_sign_loss = "allow"
+cast_precision_loss = "allow"
+cast_lossless = "allow"
+unnecessary_cast = "allow"
+
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+doc_markdown = "allow"
+
+enum_variant_names = "allow"
+struct_field_names = "allow"
+struct_excessive_bools = "allow"
+fn_params_excessive_bools = "allow"
+similar_names = "allow"
+
+items_after_statements = "allow"
+match_wildcard_for_single_variants = "allow"
+single_match_else = "allow"
+implicit_hasher = "allow"
+indexing_slicing = "allow"
+
+should_panic_without_expect = "allow"
+
+# Server release profile. Before the split the backend inherited the contracts'
+# WASM profile (opt-level "z", lto, panic = "abort"); that is wrong for a
+# long-running HTTP service, so this restores runtime-oriented optimisation and
+# panic = "unwind" (a panicking request handler must not abort the whole
+# process). overflow-checks stays on — the ledger/time math relies on it.
+[profile.release]
+opt-level = 3
+overflow-checks = true
+panic = "unwind"
+debug = 0
+strip = "symbols"
+
+[package]
+name = "heirloom-protocol-backend"
+version = "0.1.0"
+edition = "2021"
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = "0.21"
+
+# Axum HTTP server (used by legacy preference + reminder API)
+axum = { version = "0.7", features = ["macros"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+futures = "0.3"
+log = "0.4"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["trace", "cors", "decompression-gzip", "decompression-deflate"] }
+
+env_logger = "0.11"
+thiserror = "1"
+csv = "1"
+
+# SQLite used by the axum DB contract (Db::open/migrate/upsert/get/all)
+rusqlite = { version = "0.33", features = ["bundled"] }
+
+# Push notifications (FCM via HTTP v1 API)
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+# Compression / decompression (gzip, deflate) for request body decompression (#132)
+flate2 = "1"
+
+# GraphQL API alternative to REST (#66)
+async-graphql = { version = "7", features = ["chrono", "uuid"] }
+async-graphql-axum = "7"
+
+# Cursor encoding for streaming API (#67)
+base64 = "0.22"
+
+# JWT authentication for WebSocket connections
+jsonwebtoken = "9"
+
+# Distributed cache for multi-node consensus checks
+redis = "0.27"
+
+# Two-factor authentication (HMAC-based TOTP implemented directly in two_factor.rs)
+rand = "0.8"
+hmac = "0.12"
+sha1 = "0.10"
+sha2 = { version = "0.10", features = ["oid"] }
+once_cell = "1"
+
+# WebAuthn assertion signature verification (#262): CBOR/COSE key parsing and
+# per-algorithm signature verification (ES256 / RS256 / EdDSA).
+#
+# RS256 verification uses `ring` (RsaPublicKeyComponents) rather than the
+# `rsa` crate: `rsa` has an unpatched RUSTSEC-2023-0071 (Marvin Attack timing
+# side-channel) advisory that fails `cargo audit --deny warnings` in CI.
+ciborium = "0.2"
+p256 = { version = "0.13", features = ["ecdsa"] }
+ecdsa = { version = "0.16", features = ["der"] }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+ring = "0.17"
+signature = "2"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.4"
+

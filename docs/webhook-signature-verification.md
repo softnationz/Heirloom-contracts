@@ -1,6 +1,6 @@
 # Webhook Signature Verification (#149)
 
-All outgoing webhook deliveries from Ethos-Protocol are signed with an HMAC
+All outgoing webhook deliveries from Heirloom-Protocol are signed with an HMAC
 digest.  Consumers must verify the signature before processing a payload to
 ensure it is authentic and has not been tampered with in transit.
 
@@ -13,19 +13,19 @@ two additional headers:
 
 | Header | Example value | Purpose |
 |---|---|---|
-| `X-Ethos-Signature` | `sha256=3e4a9c...` | HMAC digest of the raw request body |
-| `X-Ethos-Timestamp` | `1753704000` | Unix timestamp (seconds) of delivery |
-| `X-Ethos-Delivery` | `uuid-v4` | Unique delivery identifier |
+| `X-Heirloom-Signature` | `sha256=3e4a9c...` | HMAC digest of the raw request body |
+| `X-Heirloom-Timestamp` | `1753704000` | Unix timestamp (seconds) of delivery |
+| `X-Heirloom-Delivery` | `uuid-v4` | Unique delivery identifier |
 
 The signature format is `<algorithm>=<hex-digest>`, where `<algorithm>` is one
 of `sha256` (default), `sha1`, or `sha512`.
 
 Consumers must:
 
-1. Validate that `X-Ethos-Timestamp` is within **±5 minutes** of the current time
+1. Validate that `X-Heirloom-Timestamp` is within **±5 minutes** of the current time
    to prevent replay attacks.
 2. Compute the expected HMAC digest from the raw request body and the shared secret.
-3. Compare the computed digest against `X-Ethos-Signature` using a **constant-time**
+3. Compare the computed digest against `X-Heirloom-Signature` using a **constant-time**
    comparison to prevent timing attacks.
 
 ---
@@ -92,8 +92,8 @@ Possible `reason` values:
 
 | Reason | Meaning |
 |---|---|
-| `missing X-Ethos-Signature header` | Signature header absent |
-| `missing X-Ethos-Timestamp header` | Timestamp header absent |
+| `missing X-Heirloom-Signature header` | Signature header absent |
+| `missing X-Heirloom-Timestamp header` | Timestamp header absent |
 | `malformed signature header (expected '<alg>=<hex>')` | Header format wrong |
 | `unsupported algorithm: <alg>` | Unknown algorithm prefix |
 | `timestamp out of tolerance: ...` | Replay window exceeded |
@@ -139,8 +139,8 @@ app.post('/webhooks', (req, res) => {
   verifyWebhook(
     req.rawBody,                         // must be the raw body string/buffer
     process.env.WEBHOOK_SECRET,
-    req.headers['x-ethos-signature'],
-    req.headers['x-ethos-timestamp'],
+    req.headers['x-heirloom-signature'],
+    req.headers['x-heirloom-timestamp'],
   );
   // Process event...
   res.sendStatus(200);
@@ -237,7 +237,7 @@ The 5-minute timestamp tolerance (`TIMESTAMP_TOLERANCE_SECS = 300`) means that
 even if an attacker captures a valid signed request, they cannot replay it
 successfully more than 5 minutes after the original delivery timestamp.
 
-For extra protection, consumers can persist the `X-Ethos-Delivery` UUID and
+For extra protection, consumers can persist the `X-Heirloom-Delivery` UUID and
 reject duplicate delivery IDs within a retention window.
 
 ---
@@ -257,5 +257,5 @@ curl -X POST http://localhost:3000/webhooks \
   }'
 ```
 
-The server will then send `X-Ethos-Signature: sha512=<hex>` on all deliveries
+The server will then send `X-Heirloom-Signature: sha512=<hex>` on all deliveries
 to that endpoint.

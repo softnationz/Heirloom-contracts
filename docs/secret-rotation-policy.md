@@ -1,6 +1,6 @@
 # Secret Rotation Policy (#103)
 
-Ethos-Protocol enforces a rotation schedule for all long-lived secrets.
+Heirloom-Protocol enforces a rotation schedule for all long-lived secrets.
 Rotation minimises the blast radius of a compromise: an exposed secret is
 usable only until it is rotated out and the grace period expires.
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `zk_verifier` contract in Ethos-Protocol is currently a **stub implementation** designed to validate the architectural integration and provide a path toward full zero-knowledge proof verification in future versions.
+The `zk_verifier` contract in Heirloom-Protocol is currently a **stub implementation** designed to validate the architectural integration and provide a path toward full zero-knowledge proof verification in future versions.
 
 This document explains:
 1. Why it is a stub
@@ -654,7 +654,7 @@ The stub allows:
 
 ### 2. Host Functions Needed
 
-Soroban must expose (or Ethos-Protocol must implement as a precompile):
+Soroban must expose (or Heirloom-Protocol must implement as a precompile):
 
 ```rust
 /// Verify a Groth16 proof
@@ -685,7 +685,7 @@ Common Reference String (CRS)
 
 **Ceremony Participants**: Minimum 3-5 independent parties running the MPC protocol.
 
-**Ethos-Protocol Integration**:
+**Heirloom-Protocol Integration**:
 
 - Verification keys stored in contract
 - New key registration requires multi-sig approval
@@ -729,7 +729,7 @@ circuit prove_vault_access(
 **Deliverables**:
 
 - [ ] Soroban exposes scalar multiplication for BN128
-- [ ] Ethos-Protocol implements Miller-Rabin for fast BN128 pairing
+- [ ] Heirloom-Protocol implements Miller-Rabin for fast BN128 pairing
 - [ ] Verification key registration framework
 - [ ] Test circuit with Groth16 (via circom + snarkjs)
 
@@ -740,7 +740,7 @@ circuit prove_vault_access(
 **Deliverables**:
 
 - [ ] Full Groth16 verifier in Rust (without host functions, naive)
-- [ ] Integration with Ethos-Protocol contract
+- [ ] Integration with Heirloom-Protocol contract
 - [ ] Trusted setup ceremony documentation
 - [ ] Example: vault access proof
 
@@ -878,7 +878,7 @@ fn test_oracle_attestation_flow() {
 
 ## Migration Notes
 
-When Soroban adds native ZK support or Ethos-Protocol implements a verifier:
+When Soroban adds native ZK support or Heirloom-Protocol implements a verifier:
 
 1. **Update** `verify_claim` implementation (drop sentinel check)
 2. **Add** verification key management endpoints

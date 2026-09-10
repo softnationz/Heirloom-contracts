@@ -1,4 +1,4 @@
-# Clippy configuration for the Ethos-Protocol workspace.
+# Clippy configuration for the Heirloom-Protocol workspace.
 #
 # Lint levels (including `clippy::pedantic`) are defined in the root Cargo.toml
 # under `[workspace.lints.clippy]`. This file holds Clippy-specific thresholds

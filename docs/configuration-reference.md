@@ -1,6 +1,6 @@
 # Configuration Reference Guide
 
-This guide documents all configuration options for Ethos-Protocol, including environment variables, contract parameters, network settings, and backend configuration. Each option includes its impact, recommended values, validation rules, and precedence information.
+This guide documents all configuration options for Heirloom-Protocol, including environment variables, contract parameters, network settings, and backend configuration. Each option includes its impact, recommended values, validation rules, and precedence information.
 
 ## Table of Contents
 
@@ -156,7 +156,7 @@ REMINDER_SECOND_LEAD_TIME_HOURS=24
 **Recommended**:
 
 ```env
-DATABASE_URL=postgres://user:password@localhost:5432/ethos
+DATABASE_URL=postgres://user:password@localhost:5432/heirloom
 DB_MAX_CONNECTIONS=10
 ```
 
@@ -172,7 +172,7 @@ DB_MAX_CONNECTIONS=10
 | `PASSKEY_RP_ORIGIN` | `string` | — | Origin URL where Passkey authentication occurs |
 | `PASSKEY_TIMEOUT_MS` | `integer` | `60000` | WebAuthn ceremony timeout in milliseconds |
 | `WEBAUTHN_ALLOWED_ORIGINS` | `string` | — | Comma-separated list of allowed WebAuthn origins |
-| `TWO_FACTOR_ISSUER` | `string` | `Ethos-Protocol` | TOTP issuer name shown in authenticator apps |
+| `TWO_FACTOR_ISSUER` | `string` | `Heirloom-Protocol` | TOTP issuer name shown in authenticator apps |
 
 **Impact**: Incorrect `PASSKEY_RP_ID` or `PASSKEY_RP_ORIGIN` will cause all Passkey authentication to fail.
 
@@ -312,7 +312,7 @@ The base compose file defines production-like services:
 | Service | Default Port | Description |
 |---|---|---|
 | `postgres` | `5432` | PostgreSQL database |
-| `backend` | `3000` | Ethos backend API |
+| `backend` | `3000` | Heirloom backend API |
 | `stellar-quickstart` | `8000` | Local Stellar node |
 
 ### docker-compose.override.yml
@@ -337,8 +337,8 @@ docker-compose -f docker-compose.yml up -d
 The backend validates required configuration at startup. Missing or invalid values produce a clear error:
 
 ```
-ERROR ethos_backend: Missing required config: CONTRACT_TTL_VAULT
-ERROR ethos_backend: Invalid DATABASE_URL: connection refused
+ERROR heirloom_backend: Missing required config: CONTRACT_TTL_VAULT
+ERROR heirloom_backend: Invalid DATABASE_URL: connection refused
 ```
 
 ### Required Variables Checklist
@@ -370,7 +370,7 @@ Before deploying, verify these are set:
 STELLAR_NETWORK=testnet
 STELLAR_RPC_URL=https://soroban-testnet.stellar.org
 CONTRACT_TTL_VAULT=<testnet-contract-id>
-DATABASE_URL=postgres://ethos:ethos@localhost:5432/ethos_dev
+DATABASE_URL=postgres://heirloom:heirloom@localhost:5432/heirloom_dev
 JWT_SECRET=dev-secret-not-for-production-use-only
 PASSKEY_RP_ID=localhost
 PASSKEY_RP_ORIGIN=http://localhost:3000
@@ -384,7 +384,7 @@ METRICS_ENABLED=false
 STELLAR_NETWORK=mainnet
 STELLAR_RPC_URL=https://mainnet.sorobanrpc.com
 CONTRACT_TTL_VAULT=<mainnet-contract-id>
-DATABASE_URL=postgres://ethos:strongpassword@db.internal:5432/ethos_prod
+DATABASE_URL=postgres://heirloom:strongpassword@db.internal:5432/heirloom_prod
 JWT_SECRET=<32-byte-random-hex>
 PASSKEY_RP_ID=yourdomain.com
 PASSKEY_RP_ORIGIN=https://yourdomain.com
@@ -400,7 +400,7 @@ SENTRY_DSN=https://your-dsn@sentry.io/project
 ```env
 STELLAR_NETWORK=standalone
 STELLAR_RPC_URL=http://stellar-quickstart:8000/soroban/rpc
-DATABASE_URL=postgres://ethos:ethos@postgres:5432/ethos
+DATABASE_URL=postgres://heirloom:heirloom@postgres:5432/heirloom
 PASSKEY_RP_ID=localhost
 PASSKEY_RP_ORIGIN=http://localhost:3000
 RUST_LOG=debug

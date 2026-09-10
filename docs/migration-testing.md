@@ -31,7 +31,7 @@ For production use, replace `MockDatabase` with a real PostgreSQL test instance 
 ### Migration Definition
 
 ```rust
-use ethos_protocol_backend::migration_testing::Migration;
+use heirloom_protocol_backend::migration_testing::Migration;
 
 let migration = Migration::new(
     "001",                                    // Version identifier
@@ -63,7 +63,7 @@ pub struct ValidationResult {
 ### Forward Migration Test
 
 ```rust
-use ethos_protocol_backend::migration_testing::{Migration, MigrationTester};
+use heirloom_protocol_backend::migration_testing::{Migration, MigrationTester};
 
 let mut tester = MigrationTester::new();
 
@@ -123,7 +123,7 @@ assert_eq!(result.error_message.as_deref(), Some("Migration is not reversible"))
 `PerformanceBenchmark` measures migration execution time against a production-like number of rows:
 
 ```rust
-use ethos_protocol_backend::migration_testing::{Migration, MigrationTester, PerformanceBenchmark};
+use heirloom_protocol_backend::migration_testing::{Migration, MigrationTester, PerformanceBenchmark};
 
 let mut tester = MigrationTester::new();
 

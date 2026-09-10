@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethos-Protocol prevents accidental creation of duplicate vaults — vaults with identical `(owner, beneficiary, check_in_interval)` parameters — by maintaining an on-chain fingerprint registry. A second `create_vault` call with the same triple is rejected with `DuplicateVault` (error 57) as long as the original vault is still active (`Locked`).
+Heirloom-Protocol prevents accidental creation of duplicate vaults — vaults with identical `(owner, beneficiary, check_in_interval)` parameters — by maintaining an on-chain fingerprint registry. A second `create_vault` call with the same triple is rejected with `DuplicateVault` (error 57) as long as the original vault is still active (`Locked`).
 
 ## How It Works
 

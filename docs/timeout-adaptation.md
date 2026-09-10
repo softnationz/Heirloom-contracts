@@ -35,7 +35,7 @@ latency instead.
 ## Example
 
 ```rust
-use ethos_protocol_backend::timeout_adaptation::{AdaptiveTimeoutManager, TimeoutAdaptationConfig};
+use heirloom_protocol_backend::timeout_adaptation::{AdaptiveTimeoutManager, TimeoutAdaptationConfig};
 use std::time::Duration;
 
 let manager = AdaptiveTimeoutManager::new(TimeoutAdaptationConfig::default());

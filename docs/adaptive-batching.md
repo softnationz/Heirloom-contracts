@@ -33,11 +33,11 @@ observed.
 
 Exposed at `GET /metrics` (Prometheus text format):
 
-- `ethos_protocol_batch_current_size` (gauge)
-- `ethos_protocol_batch_average_latency_ms` (gauge)
-- `ethos_protocol_batches_processed_total` (counter)
-- `ethos_protocol_batch_items_processed_total` (counter)
-- `ethos_protocol_batch_resizes_total` (counter)
+- `heirloom_protocol_batch_current_size` (gauge)
+- `heirloom_protocol_batch_average_latency_ms` (gauge)
+- `heirloom_protocol_batches_processed_total` (counter)
+- `heirloom_protocol_batch_items_processed_total` (counter)
+- `heirloom_protocol_batch_resizes_total` (counter)
 
 ## Configuration
 

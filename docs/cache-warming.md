@@ -80,7 +80,7 @@ const MAX_PREFETCH_BATCH: usize = 50;            // Max per warming cycle
 ### Recording Access Patterns
 
 ```rust
-use ethos_protocol_backend::cache_warming::CacheWarmer;
+use heirloom_protocol_backend::cache_warming::CacheWarmer;
 
 let warmer = CacheWarmer::new();
 

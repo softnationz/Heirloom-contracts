@@ -1,6 +1,6 @@
 # Interactive Playground
 
-The Ethos-Protocol Interactive Playground is a web-based environment that lets you experiment with vault operations against a live testnet (or a local Stellar Quickstart node) without any local toolchain setup. It lowers the barrier to learning by providing pre-configured scenarios, a built-in editor, and one-click execution in your browser.
+The Heirloom-Protocol Interactive Playground is a web-based environment that lets you experiment with vault operations against a live testnet (or a local Stellar Quickstart node) without any local toolchain setup. It lowers the barrier to learning by providing pre-configured scenarios, a built-in editor, and one-click execution in your browser.
 
 ## Table of Contents
 

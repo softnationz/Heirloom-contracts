@@ -1,4 +1,4 @@
-# Network configurations for Ethos-Protocol contract deployment.
+# Network configurations for Heirloom-Protocol contract deployment.
 # Populated/updated automatically by scripts/deploy_testnet.sh and
 # scripts/deploy_mainnet.sh via scripts/deploy_utils.sh. `contract_ttl_vault`
 # must remain the first key under each section header - deploy_utils.sh

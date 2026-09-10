@@ -3,28 +3,28 @@ version: '3.9'
 services:
   db:
     image: postgres:16-alpine
-    container_name: ethos-protocol-db
+    container_name: heirloom-protocol-db
     environment:
-      POSTGRES_USER: ethos_user
-      POSTGRES_PASSWORD: ethos_password
-      POSTGRES_DB: ethos_protocol
+      POSTGRES_USER: heirloom_user
+      POSTGRES_PASSWORD: heirloom_password
+      POSTGRES_DB: heirloom_protocol
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ethos_user -d ethos_protocol"]
+      test: ["CMD-SHELL", "pg_isready -U heirloom_user -d heirloom_protocol"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: ethos-protocol-backend
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: heirloom-protocol-backend
     environment:
-      DATABASE_URL: postgres://ethos_user:ethos_password@db:5432/ethos_protocol
+      DATABASE_URL: postgres://heirloom_user:heirloom_password@db:5432/heirloom_protocol
       REDIS_URL: redis://redis:6379
       NODE_ID: backend-primary
       CONSENSUS_STRATEGY: last_write_wins
@@ -41,7 +41,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: ethos-protocol-redis
+    container_name: heirloom-protocol-redis
     ports:
       - "6379:6379"
     healthcheck:

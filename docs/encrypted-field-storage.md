@@ -1,6 +1,6 @@
 # Encrypted Field Storage (#101)
 
-Ethos-Protocol encrypts sensitive database fields at rest using AES-256-GCM
+Heirloom-Protocol encrypts sensitive database fields at rest using AES-256-GCM
 authenticated encryption.  Each encrypted value carries its key version so
 that multiple key versions can coexist during a rotation grace period.
 

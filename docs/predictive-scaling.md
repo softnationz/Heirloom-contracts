@@ -10,7 +10,7 @@ Implementation: `backend/src/predictive_scaling.rs`.
 ## Traffic history
 
 A background task (`predictive_scaling::run`, spawned from `main.rs`)
-samples the delta of `ethos_protocol_http_requests_total` every
+samples the delta of `heirloom_protocol_http_requests_total` every
 `sample_interval` (5 minutes in production) and records it as a
 `TrafficSample` in `PredictiveScaler::history` (default: 288 samples, i.e.
 24h of 5-minute buckets).
@@ -45,9 +45,9 @@ infrastructure.
 
 Exposed at `GET /metrics` (Prometheus text format):
 
-- `ethos_protocol_scaling_recommended_replicas` (gauge)
-- `ethos_protocol_scaling_forecast_requests` (gauge)
-- `ethos_protocol_scaling_decisions_total` (counter)
+- `heirloom_protocol_scaling_recommended_replicas` (gauge)
+- `heirloom_protocol_scaling_forecast_requests` (gauge)
+- `heirloom_protocol_scaling_decisions_total` (counter)
 
 ## Configuration
 

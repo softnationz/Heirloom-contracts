@@ -33,7 +33,7 @@ All four injectors implement `FaultInjector`, so they plug into a single
 `ChaosRunner`:
 
 ```rust
-use ethos_protocol_backend::chaos::{ChaosRunner, NetworkFailureInjector, FaultInjector};
+use heirloom_protocol_backend::chaos::{ChaosRunner, NetworkFailureInjector, FaultInjector};
 
 let injector = NetworkFailureInjector::new(0.3); // 30% of calls fail
 let runner = ChaosRunner::new(&injector);
@@ -80,7 +80,7 @@ without further changes.
 ## Running the tests
 
 ```
-cargo test -p ethos-protocol-backend chaos::
+cargo test -p heirloom-protocol-backend chaos::
 ```
 
 Note: `chaos.rs` relies on `std::panic::catch_unwind`, which requires the

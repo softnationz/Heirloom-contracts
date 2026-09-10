@@ -1,6 +1,6 @@
 # Compliance Audit Reports
 
-Task #99 — Compliance status tracking and audit report generation for Ethos-Protocol.
+Task #99 — Compliance status tracking and audit report generation for Heirloom-Protocol.
 
 ## Overview
 
@@ -163,7 +163,7 @@ Set all four variables in production deployments to achieve maximum compliance c
 The core check functions are exposed as public Rust APIs:
 
 ```rust
-use ethos_protocol_backend::compliance::{run_compliance_checks, generate_pdf_stub};
+use heirloom_protocol_backend::compliance::{run_compliance_checks, generate_pdf_stub};
 
 // Run all GDPR, SOC 2, and ISO 27001 checks
 let checks = run_compliance_checks();

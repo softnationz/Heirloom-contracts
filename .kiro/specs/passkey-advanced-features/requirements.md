@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature covers four advanced passkey capabilities for the Ethos-Protocol vault system (issues #557–#560). The vault contract already supports multi-passkey storage (`VaultPasskeys`), per-passkey expiry (`PasskeyExpiry`), usage tracking (`PasskeyUsage`), and a backend notification service. These four issues extend that foundation with:
+This feature covers four advanced passkey capabilities for the Heirloom-Protocol vault system (issues #557–#560). The vault contract already supports multi-passkey storage (`VaultPasskeys`), per-passkey expiry (`PasskeyExpiry`), usage tracking (`PasskeyUsage`), and a backend notification service. These four issues extend that foundation with:
 
 - **Passkey Delegation** (#557): allow a vault owner to temporarily grant another address the right to perform check-ins using a specific passkey.
 - **Passkey Audit Trail** (#558): record every passkey lifecycle event (add, remove, rotate, use) with a timestamp and actor, queryable on-chain.

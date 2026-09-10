@@ -1,14 +1,19 @@
-# Ethos-Protocol — Micro-Endowment Check-In Vault on Stellar
+# Heirloom-Protocol — Micro-Endowment Check-In Vault on Stellar
 
 [![CI](https://github.com/ethos-protocol/ethos-contracts-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/ethos-protocol/ethos-contracts-backend/actions/workflows/ci.yml)
 
 A decentralized "Dead Man's Switch" built on Stellar/Soroban smart contracts.
 
-Ethos-Protocol is a time-capsule vault where funds (XLM or tokenized assets) are released to a beneficiary only if the owner fails to "check in" via a Passkey-powered interface. It leverages Soroban's State Archival and TTL (Time to Live) features to automate asset inheritance — no seed phrase complexity required.
+> **Repository layout:** this repo is two independent Cargo workspaces —
+> `contracts/` (on-chain Soroban/WASM) and `backend/` (off-chain HTTP/GraphQL
+> service). There is no root `Cargo.toml`; run `cargo` from inside either
+> directory. See [REPO_LAYOUT.md](REPO_LAYOUT.md).
 
-## 🎯 What is Ethos-Protocol?
+Heirloom-Protocol is a time-capsule vault where funds (XLM or tokenized assets) are released to a beneficiary only if the owner fails to "check in" via a Passkey-powered interface. It leverages Soroban's State Archival and TTL (Time to Live) features to automate asset inheritance — no seed phrase complexity required.
 
-Ethos-Protocol turns Stellar's native state archival mechanics into a programmable inheritance trigger. Vault owners:
+## 🎯 What is Heirloom-Protocol?
+
+Heirloom-Protocol turns Stellar's native state archival mechanics into a programmable inheritance trigger. Vault owners:
 
 - Deposit funds into a personal vault contract
 - Periodically "check in" to extend the contract's TTL and prove liveness
@@ -17,7 +22,7 @@ Ethos-Protocol turns Stellar's native state archival mechanics into a programmab
 
 If the owner stops checking in, the contract's TTL expires and the vault automatically releases funds to the beneficiary.
 
-This Soroban implementation makes Ethos-Protocol:
+This Soroban implementation makes Heirloom-Protocol:
 
 ✅ Trustless (no executor, lawyer, or coordinator needed)  
 ✅ Transparent (all vault state and transfers are on-chain)  
@@ -257,7 +262,8 @@ Comprehensive test suite covering:
 Run tests:
 
 ```bash
-cargo test
+cd contracts && cargo test        # on-chain contracts
+cd backend   && cargo test        # off-chain service
 ```
 
 ## 🌍 Why This Matters

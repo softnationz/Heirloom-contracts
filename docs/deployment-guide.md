@@ -1,8 +1,8 @@
-# Ethos-Protocol Deployment Guide
+# Heirloom-Protocol Deployment Guide
 
 ## Overview
 
-This guide covers deploying Ethos-Protocol to Stellar mainnet with security best practices, configuration, and rollback procedures.
+This guide covers deploying Heirloom-Protocol to Stellar mainnet with security best practices, configuration, and rollback procedures.
 
 ## Prerequisites
 

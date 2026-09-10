@@ -34,7 +34,7 @@ of ad hoc cleanup code scattered through handlers.
 ## Example
 
 ```rust
-use ethos_protocol_backend::saga::Saga;
+use heirloom_protocol_backend::saga::Saga;
 
 let saga = Saga::builder("release-vault")
     .step("mark-released", 0, || { /* ... */ Ok(serde_json::json!({"vault_id": "v1"})) })

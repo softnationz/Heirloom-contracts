@@ -133,7 +133,7 @@ let current = replayer.replay(&vault_id)?;
 ## Running the tests
 
 ```bash
-cargo test -p ethos-protocol-backend event_sourcing
+cargo test -p heirloom-protocol-backend event_sourcing
 ```
 
 All tests live in the `tests` module at the bottom of `event_sourcing.rs`.

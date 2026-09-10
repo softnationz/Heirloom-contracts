@@ -1,4 +1,4 @@
-title = "Ethos-Protocol gitleaks config"
+title = "Heirloom-Protocol gitleaks config"
 
 [allowlist]
   description = "Allow test/example values and documentation placeholders"

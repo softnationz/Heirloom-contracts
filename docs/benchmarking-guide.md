@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethos-Protocol includes a comprehensive benchmarking suite using [Criterion.rs](https://bheisler.github.io/criterion.rs/book/) to track contract performance and detect regressions.
+Heirloom-Protocol includes a comprehensive benchmarking suite using [Criterion.rs](https://bheisler.github.io/criterion.rs/book/) to track contract performance and detect regressions.
 
 ## Running Benchmarks
 

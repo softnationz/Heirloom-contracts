@@ -1,6 +1,6 @@
 # Use Case Documentation
 
-This document describes common use cases for Ethos-Protocol, providing step-by-step instructions, code examples, troubleshooting guidance, and variations for each scenario.
+This document describes common use cases for Heirloom-Protocol, providing step-by-step instructions, code examples, troubleshooting guidance, and variations for each scenario.
 
 ## Table of Contents
 

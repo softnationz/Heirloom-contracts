@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # scripts/install-hooks.sh
 #
-# Installs git hooks for the ethos-contracts-backend project.
+# Installs git hooks for the heirloom-contracts-backend project.
 #
 # Currently installs:
 #   • pre-commit — secret scanning via gitleaks (scripts/pre-commit-secret-scan.sh)
@@ -76,7 +76,7 @@ HOOK_CONTENT
 }
 
 # ─── Install hooks ────────────────────────────────────────────────────────────
-echo -e "${CYAN}${BOLD}Installing git hooks for ethos-contracts-backend…${RESET}"
+echo -e "${CYAN}${BOLD}Installing git hooks for heirloom-contracts-backend…${RESET}"
 echo ""
 
 install_hook "pre-commit" "${SCRIPTS_DIR}/pre-commit-secret-scan.sh"

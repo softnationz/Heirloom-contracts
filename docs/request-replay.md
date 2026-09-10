@@ -97,7 +97,7 @@ curl -X POST http://localhost:3000/replay \
 To log a request from a handler, call `record_request` with a `RequestLog`:
 
 ```rust
-use ethos_protocol_backend::replay::{record_request, RequestLog};
+use heirloom_protocol_backend::replay::{record_request, RequestLog};
 
 let log = RequestLog::new(
     "POST",

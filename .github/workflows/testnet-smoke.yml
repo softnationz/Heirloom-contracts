@@ -28,11 +28,12 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+            contracts/target/
+          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('contracts/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-wasm-
 
       - name: Build contract WASM
+        working-directory: contracts
         run: cargo build --package ttl-vault --target wasm32-unknown-unknown --release
 
       - name: Install Stellar CLI
@@ -89,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           CONTRACT_ID=$(stellar contract deploy \
-            --wasm target/wasm32-unknown-unknown/release/ttl_vault.wasm \
+            --wasm contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm \
             --source "smoke-admin-${KEY_SUFFIX}" \
             --network testnet)
           echo "CONTRACT_ID=${CONTRACT_ID}" >> "$GITHUB_ENV"
@@ -165,7 +166,7 @@ jobs:
         run: |
           set -euo pipefail
           # Any deterministic 32-byte value works as a passkey hash in the smoke test
-          PASSKEY_HASH=$(echo -n "ethos-protocol-smoke-test" | sha256sum | awk '{print $1}')
+          PASSKEY_HASH=$(echo -n "heirloom-protocol-smoke-test" | sha256sum | awk '{print $1}')
 
           stellar contract invoke \
             --id "${CONTRACT_ID}" \

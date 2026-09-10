@@ -75,7 +75,7 @@ The multilevel cache handles three data types per vault:
 ### Create and Use
 
 ```rust
-use ethos_protocol_backend::multilevel_cache::MultiLevelCache;
+use heirloom_protocol_backend::multilevel_cache::MultiLevelCache;
 
 let cache = MultiLevelCache::new();
 

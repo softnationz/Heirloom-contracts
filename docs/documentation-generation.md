@@ -72,7 +72,7 @@ The generator is a library function, so the process is a short driver that
 reads sources and writes markdown:
 
 ```rust
-use ethos_protocol_backend::doc_generator::generate;
+use heirloom_protocol_backend::doc_generator::generate;
 
 let source = std::fs::read_to_string("backend/src/feature_flags.rs")?;
 let markdown = generate("feature_flags", &source, Some(&source));

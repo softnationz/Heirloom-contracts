@@ -1,6 +1,6 @@
 # Architecture Overview
 
-The Ethos-Protocol system is a decentralized, secure, and user-friendly platform built on the Stellar blockchain, designed to manage vault lifecycles based on Time-To-Live (TTL) logic.
+The Heirloom-Protocol system is a decentralized, secure, and user-friendly platform built on the Stellar blockchain, designed to manage vault lifecycles based on Time-To-Live (TTL) logic.
 
 ## Component Diagram
 

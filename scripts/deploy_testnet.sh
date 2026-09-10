@@ -12,7 +12,7 @@ if [[ "$1" == "--force" ]]; then
   FORCE_DEPLOY=true
 fi
 
-echo "Deploying Ethos-Protocol to $NETWORK..."
+echo "Deploying Heirloom-Protocol to $NETWORK..."
 
 # Check for existing deployment
 EXISTING_CONTRACT=$(get_contract_address "$NETWORK")
@@ -30,7 +30,7 @@ fi
 # Build first
 ./scripts/build.sh
 
-WASM="target/wasm32-unknown-unknown/release/ttl_vault.wasm"
+WASM="contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm"
 
 echo "Deploying contract to $NETWORK..."
 CONTRACT_ID=$(stellar contract deploy \

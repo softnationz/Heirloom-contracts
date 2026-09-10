@@ -1,6 +1,6 @@
 # Best Practices Guide
 
-This guide documents recommended practices for developing, deploying, and operating Ethos-Protocol. Following these practices improves security, reliability, and maintainability.
+This guide documents recommended practices for developing, deploying, and operating Heirloom-Protocol. Following these practices improves security, reliability, and maintainability.
 
 ## Table of Contents
 
@@ -321,7 +321,7 @@ Ensure indexes exist on `vault_id`, `owner_address`, and `beneficiary_address` i
 
 **Never expose seed phrases**
 
-Ethos-Protocol is designed to avoid seed phrases entirely. Use Passkey/WebAuthn for all owner authentication. Do not add seed-phrase-based fallbacks.
+Heirloom-Protocol is designed to avoid seed phrases entirely. Use Passkey/WebAuthn for all owner authentication. Do not add seed-phrase-based fallbacks.
 
 **Rotate JWT secrets periodically**
 

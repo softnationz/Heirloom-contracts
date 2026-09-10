@@ -35,10 +35,10 @@ before a request reaches its handler:
 
 Exposed at `GET /metrics` (Prometheus text format):
 
-- `ethos_protocol_load_shedding_inflight` (gauge)
-- `ethos_protocol_load_shedding_accepted_total` (counter)
-- `ethos_protocol_load_shedding_rejected_total` (counter)
-- `ethos_protocol_load_shedding_shed_total` (counter)
+- `heirloom_protocol_load_shedding_inflight` (gauge)
+- `heirloom_protocol_load_shedding_accepted_total` (counter)
+- `heirloom_protocol_load_shedding_rejected_total` (counter)
+- `heirloom_protocol_load_shedding_shed_total` (counter)
 
 ## Configuration
 

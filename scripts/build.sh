@@ -9,7 +9,7 @@ fi
 
 # Audit required environment variables
 # Note: build.sh itself doesn't strictly need these for compilation, but we check them
-# because they are essential for the overall Ethos-Protocol setup as per README.
+# because they are essential for the overall Heirloom-Protocol setup as per README.
 REQUIRED_VARS=("STELLAR_NETWORK" "STELLAR_RPC_URL" "REMINDER_EMAIL_API_KEY" "REMINDER_SMS_API_KEY")
 
 for var in "${REQUIRED_VARS[@]}"; do
@@ -18,7 +18,7 @@ for var in "${REQUIRED_VARS[@]}"; do
   fi
 done
 
-echo "Building Ethos-Protocol contracts..."
+echo "Building Heirloom-Protocol contracts..."
 cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/ttl_vault/Cargo.toml
 cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/zk_verifier/Cargo.toml
 cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/sbt/Cargo.toml

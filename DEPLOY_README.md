@@ -25,12 +25,12 @@ This deployment moves the graceful degradation capability status registry from p
 ### Step 1: Build and Test Locally
 
 ```bash
-# Build the project
-cd /workspaces/ethos-contracts-backend
-cargo build --package backend
+# The backend is now its own workspace — run cargo from backend/.
+cd backend
+cargo build
 
 # Run all tests including new shared store tests
-cargo test --package backend --lib degradation
+cargo test --lib degradation
 
 # Key tests to verify:
 # - test_two_handles_share_same_store (multi-instance)
@@ -79,7 +79,7 @@ CREATE INDEX IF NOT EXISTS idx_capability_statuses_updated_at
 docker-compose up -d
 
 # Or manually build and run backend
-cd /workspaces/ethos-contracts-backend
+cd /workspaces/heirloom-contracts-backend
 cargo run --package backend
 ```
 

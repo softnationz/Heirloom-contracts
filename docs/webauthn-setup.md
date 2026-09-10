@@ -1,6 +1,6 @@
 # WebAuthn / FIDO2 Setup Guide (#148)
 
-Ethos-Protocol supports WebAuthn (FIDO2) for phishing-resistant, hardware-backed
+Heirloom-Protocol supports WebAuthn (FIDO2) for phishing-resistant, hardware-backed
 authentication.  Vault owners can register security keys (YubiKey, Apple Touch ID,
 Windows Hello, etc.) and use them to perform check-ins without a seed phrase.
 
@@ -46,14 +46,14 @@ Client                Backend                   Authenticator
 | Variable | Default | Description |
 |---|---|---|
 | `WEBAUTHN_RP_ID` | `localhost` | Relying Party ID — must match the domain serving the frontend |
-| `WEBAUTHN_RP_NAME` | `Ethos Protocol` | Human-readable name shown by authenticators |
+| `WEBAUTHN_RP_NAME` | `Heirloom Protocol` | Human-readable name shown by authenticators |
 | `WEBAUTHN_ORIGIN` | `http://localhost:3000` | Exact origin of your frontend (`scheme://host[:port]`) |
 
 Set these before starting the backend:
 
 ```bash
 export WEBAUTHN_RP_ID=app.ethos-protocol.xyz
-export WEBAUTHN_RP_NAME="Ethos Protocol"
+export WEBAUTHN_RP_NAME="Heirloom Protocol"
 export WEBAUTHN_ORIGIN=https://app.ethos-protocol.xyz
 ```
 
@@ -83,7 +83,7 @@ Start a registration ceremony.  Returns a challenge the browser must sign.
 ```json
 {
   "session_id": "<token>",
-  "rp": { "id": "example.com", "name": "Ethos Protocol" },
+  "rp": { "id": "example.com", "name": "Heirloom Protocol" },
   "user": { "id": "<b64url-user-handle>", "name": "alice@example.com", "display_name": "alice@example.com" },
   "challenge": "<b64url-challenge>",
   "pub_key_cred_params": [

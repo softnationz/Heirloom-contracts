@@ -252,9 +252,9 @@ tokio::spawn(async move {
 Expose benchmark metrics via Prometheus:
 
 ```
-ethos_timeseries_raw_point_count{series="vault.balance"} 100000
-ethos_timeseries_compression_ratio{series="vault.balance"} 1.5
-ethos_timeseries_partition_count{series="vault.balance"} 12
+heirloom_timeseries_raw_point_count{series="vault.balance"} 100000
+heirloom_timeseries_compression_ratio{series="vault.balance"} 1.5
+heirloom_timeseries_partition_count{series="vault.balance"} 12
 ```
 
 ## Notes

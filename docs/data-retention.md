@@ -1,6 +1,6 @@
 # Data Retention Policies (#100)
 
-Ethos-Protocol applies configurable data retention policies to limit how long
+Heirloom-Protocol applies configurable data retention policies to limit how long
 different classes of records are kept.  Automated purging is performed daily by
 the background scheduler; manual purges can be triggered via the REST API.
 
