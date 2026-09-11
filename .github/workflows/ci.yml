@@ -17,7 +17,7 @@ jobs:
       run:
         working-directory: Heirloom-contracts
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Pinned (not @stable): newer rustc releases reject an unsound transmute
       # in ethnum 1.5.2 (a transitive Soroban SDK dependency) with E0512, which
@@ -72,7 +72,7 @@ jobs:
       run:
         working-directory: Heirloom-backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@1.96.1
         with:
@@ -110,7 +110,7 @@ jobs:
     name: Repo checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Scan for secrets with Gitleaks
         # gitleaks/gitleaks-action@v2 now gates organization repos behind a
