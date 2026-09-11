@@ -27,7 +27,7 @@ jobs:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry/index/
@@ -78,7 +78,7 @@ jobs:
         with:
           components: clippy, rustfmt
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry/index/
