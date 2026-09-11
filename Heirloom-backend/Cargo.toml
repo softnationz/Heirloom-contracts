@@ -1,6 +1,6 @@
 # The backend is its own standalone Cargo workspace (single member: this crate).
-# The on-chain contracts live in ../contracts and build as a separate workspace;
-# nothing here depends on soroban-sdk. See ../REPO_LAYOUT.md.
+# The on-chain contracts live in ../Heirloom-contracts and build as a separate
+# workspace; nothing here depends on soroban-sdk. See ../REPO_LAYOUT.md.
 [workspace]
 
 [workspace.package]
@@ -97,7 +97,6 @@ flate2 = "1"
 
 # GraphQL API alternative to REST (#66)
 async-graphql = { version = "7", features = ["chrono", "uuid"] }
-async-graphql-axum = "7"
 
 # Cursor encoding for streaming API (#67)
 base64 = "0.22"
@@ -129,6 +128,5 @@ ring = "0.17"
 signature = "2"
 
 [dev-dependencies]
-tokio-test = "0.4"
 mockito = "1.4"
 

@@ -103,7 +103,6 @@ pub struct StoredCredential {
 struct PendingRegistration {
     challenge: Vec<u8>,
     user_id: String,
-    user_name: String,
     expires_at: u64,
 }
 
@@ -548,7 +547,6 @@ pub async fn begin_registration(
     let pending = PendingRegistration {
         challenge: challenge.clone(),
         user_id: body.user_id.clone(),
-        user_name: body.user_name.clone(),
         expires_at: now_secs() + CHALLENGE_TTL_SECS,
     };
 
@@ -1113,7 +1111,6 @@ pub async fn add_backup_authenticator(
     let pending = PendingRegistration {
         challenge: challenge.clone(),
         user_id: user_id.clone(),
-        user_name: body.user_id.clone(),
         expires_at: now_secs() + CHALLENGE_TTL_SECS,
     };
 
@@ -1266,7 +1263,7 @@ mod tests {
         let cred_id_bytes = b64url_decode(&cred_id).unwrap();
         let reg_auth_data = registration_auth_data(&cred_id_bytes, &cose_key);
 
-        complete_registration(
+        let _ = complete_registration(
             State(Arc::clone(state)),
             Json(CompleteRegistrationRequest {
                 session_id: begin.session_id,
@@ -1352,7 +1349,6 @@ mod tests {
     }
 
     fn sign_assertion_rs256(challenge: &str, sign_count: u32) -> (String, String, String) {
-        use ring::signature::KeyPair as _;
         let client_data = client_data_json("webauthn.get", challenge, "http://localhost:3000");
         let client_data_raw = b64url_decode(&client_data).unwrap();
         let auth_data = fake_auth_data(sign_count);
@@ -1494,7 +1490,7 @@ mod tests {
         let (_, Json(auth_begin)) = auth_begin;
         let (client_data, auth_data, signature) =
             sign_assertion(&signing_key, &auth_begin.challenge, 5);
-        complete_authentication(
+        let _ = complete_authentication(
             State(Arc::clone(&state)),
             Json(CompleteAuthenticationRequest {
                 session_id: auth_begin.session_id,

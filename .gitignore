@@ -6,8 +6,8 @@ target/
 *.snap.new
 test_snapshots/
 *.proptest-regressions
-contracts/*/fuzz/corpus/
-contracts/*/fuzz/artifacts/
+Heirloom-contracts/*/fuzz/corpus/
+Heirloom-contracts/*/fuzz/artifacts/
 fuzz/corpus/
 fuzz/artifacts/
 

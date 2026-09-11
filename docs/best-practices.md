@@ -460,7 +460,7 @@ See [Integration Testing Guide](integration-testing-guide.md) for the full proce
 
 **Use fuzz testing for critical paths**
 
-The project includes a fuzz test harness under `contracts/ttl_vault/fuzz/`. Run periodically:
+The project includes a fuzz test harness under `Heirloom-contracts/ttl_vault/fuzz/`. Run periodically:
 
 ```bash
 cargo fuzz run fuzz_target_1

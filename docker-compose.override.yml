@@ -5,11 +5,11 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - ./backend/migrations:/docker-entrypoint-initdb.d
+      - ./Heirloom-backend/migrations:/docker-entrypoint-initdb.d
 
   backend:
     build:
-      context: ./backend
+      context: ./Heirloom-backend
       dockerfile: Dockerfile
       target: development
     environment:

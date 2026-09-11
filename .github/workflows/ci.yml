@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: contracts
+        working-directory: Heirloom-contracts
     steps:
       - uses: actions/checkout@v4
 
@@ -33,8 +33,8 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            contracts/target/
-          key: ${{ runner.os }}-cargo-contracts-${{ hashFiles('contracts/Cargo.lock') }}
+            Heirloom-contracts/target/
+          key: ${{ runner.os }}-cargo-contracts-${{ hashFiles('Heirloom-contracts/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-contracts-
 
       - name: Build crate
@@ -59,7 +59,7 @@ jobs:
         working-directory: .
         run: |
           CHANGELOG_VERSION=$(grep -m 1 "^## \[" CHANGELOG.md | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/')
-          LIB_VERSION=$(grep -oE 'DataKey::Version.*"([0-9]+\.[0-9]+\.[0-9]+)"' contracts/ttl_vault/src/lib.rs | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          LIB_VERSION=$(grep -oE 'DataKey::Version.*"([0-9]+\.[0-9]+\.[0-9]+)"' Heirloom-contracts/ttl_vault/src/lib.rs | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           if [ "$CHANGELOG_VERSION" != "$LIB_VERSION" ]; then
             echo "Version mismatch: CHANGELOG ($CHANGELOG_VERSION) != lib.rs ($LIB_VERSION)"
             exit 1
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: Heirloom-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -84,8 +84,8 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            backend/target/
-          key: ${{ runner.os }}-cargo-backend-${{ hashFiles('backend/Cargo.lock') }}
+            Heirloom-backend/target/
+          key: ${{ runner.os }}-cargo-backend-${{ hashFiles('Heirloom-backend/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-backend-
 
       - name: Build

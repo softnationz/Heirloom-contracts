@@ -25,8 +25,8 @@ This deployment moves the graceful degradation capability status registry from p
 ### Step 1: Build and Test Locally
 
 ```bash
-# The backend is now its own workspace — run cargo from backend/.
-cd backend
+# The backend is now its own workspace — run cargo from Heirloom-backend/.
+cd Heirloom-backend
 cargo build
 
 # Run all tests including new shared store tests
@@ -44,7 +44,7 @@ cargo test --lib degradation
 cargo fmt --all -- --check
 
 # Linting
-cargo clippy --package backend -- -D warnings
+cargo clippy --package heirloom-protocol-backend -- -D warnings
 
 # Security audit
 cargo audit --deny warnings
@@ -56,7 +56,7 @@ The migration runs automatically on server startup:
 
 ```bash
 # Migration #12 creates the capability_statuses table
-# Location: backend/src/db.rs in MIGRATIONS const
+# Location: Heirloom-backend/src/db.rs in MIGRATIONS const
 ```
 
 **Migration Details:**
@@ -80,7 +80,7 @@ docker-compose up -d
 
 # Or manually build and run backend
 cd /workspaces/heirloom-contracts-backend
-cargo run --package backend
+cargo run --package heirloom-protocol-backend
 ```
 
 ### Step 5: Verify Deployment
@@ -270,7 +270,7 @@ Instance A             Instance B
 ```bash
 # 1. Deploy previous version (before degradation fix)
 git checkout <previous-commit>
-cargo build --package backend
+cargo build --package heirloom-protocol-backend
 ./start-backend.sh
 
 # 2. The table remains in database (harmless)
@@ -408,7 +408,7 @@ ssh instance_b ping database_server
 
 - **Code Issues**: Check CODE_CHANGES_SUMMARY.md for implementation details
 - **Testing Issues**: See TESTING_DEGRADATION_FIX.md for test procedures
-- **Database Issues**: Verify migration #12 in backend/src/db.rs
+- **Database Issues**: Verify migration #12 in Heirloom-backend/src/db.rs
 - **API Questions**: Refer to this file's "API Reference" section
 
 ## Success Criteria

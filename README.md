@@ -5,9 +5,9 @@
 A decentralized "Dead Man's Switch" built on Stellar/Soroban smart contracts.
 
 > **Repository layout:** this repo is two independent Cargo workspaces —
-> `contracts/` (on-chain Soroban/WASM) and `backend/` (off-chain HTTP/GraphQL
-> service). There is no root `Cargo.toml`; run `cargo` from inside either
-> directory. See [REPO_LAYOUT.md](REPO_LAYOUT.md).
+> `Heirloom-contracts/` (on-chain Soroban/WASM) and `Heirloom-backend/`
+> (off-chain HTTP/GraphQL service). There is no root `Cargo.toml`; run
+> `cargo` from inside either directory. See [REPO_LAYOUT.md](REPO_LAYOUT.md).
 
 Heirloom-Protocol is a time-capsule vault where funds (XLM or tokenized assets) are released to a beneficiary only if the owner fails to "check in" via a Passkey-powered interface. It leverages Soroban's State Archival and TTL (Time to Live) features to automate asset inheritance — no seed phrase complexity required.
 
@@ -262,8 +262,8 @@ Comprehensive test suite covering:
 Run tests:
 
 ```bash
-cd contracts && cargo test        # on-chain contracts
-cd backend   && cargo test        # off-chain service
+cd Heirloom-contracts && cargo test        # on-chain contracts
+cd Heirloom-backend   && cargo test        # off-chain service
 ```
 
 ## 🌍 Why This Matters

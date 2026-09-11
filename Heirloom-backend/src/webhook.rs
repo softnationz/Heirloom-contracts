@@ -355,24 +355,6 @@ async fn attempt_delivery(
     );
 }
 
-/// Compute HMAC-SHA256 hex signature over `body` using `secret`.
-///
-/// The signature is placed in the `X-Heirloom-Signature: sha256=<hex>` header so
-/// that receivers can verify authenticity using the shared secret.
-fn sign_payload(body: &str, secret: &str) -> String {
-    use hmac::{Hmac, Mac};
-    use sha2::Sha256;
-
-    type HmacSha256 = Hmac<Sha256>;
-
-    let mut mac =
-        HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC accepts keys of any length");
-    mac.update(body.as_bytes());
-    let result = mac.finalize().into_bytes();
-
-    result.iter().map(|b| format!("{b:02x}")).collect()
-}
-
 // ── Signature algorithms (#149) ───────────────────────────────────────────────
 
 /// HMAC algorithm used for webhook payload signing and verification.
@@ -622,11 +604,6 @@ pub async fn verify_webhook(
     (status, Json(result))
 }
 
-// ── Update `attempt_delivery` to use multi-algorithm signing ─────────────────
-// Note: `attempt_delivery` above calls the old `sign_payload` helper directly.
-// The following public re-export lets callers use the new versioned helper.
-// The internal `sign_payload` is kept for backwards compat with existing tests.
-
 /// Build the `X-Heirloom-Signature` and `X-Heirloom-Timestamp` headers for a
 /// webhook delivery.  Call this from `attempt_delivery` when a secret is set.
 pub fn build_signature_headers(
@@ -737,7 +714,10 @@ mod tests {
         let ts = ts_now();
         let result = verify_webhook_signature("body", "secret", None, Some(&ts));
         assert!(!result.valid);
-        assert!(result.reason.unwrap().contains("missing X-Heirloom-Signature"));
+        assert!(result
+            .reason
+            .unwrap()
+            .contains("missing X-Heirloom-Signature"));
     }
 
     #[test]

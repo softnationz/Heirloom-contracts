@@ -20,7 +20,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./Heirloom-backend
       dockerfile: Dockerfile
     container_name: heirloom-protocol-backend
     environment:
@@ -37,7 +37,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend/src:/app/src
+      - ./Heirloom-backend/src:/app/src
 
   redis:
     image: redis:7-alpine

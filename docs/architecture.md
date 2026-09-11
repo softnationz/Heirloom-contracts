@@ -62,7 +62,7 @@ sequenceDiagram
 
 For detailed information on specific components, please refer to the following:
 
-- **Smart Contracts**: `contracts/ttl_vault/src/lib.rs`, `contracts/zk_verifier/src/lib.rs`
+- **Smart Contracts**: `Heirloom-contracts/ttl_vault/src/lib.rs`, `Heirloom-contracts/zk_verifier/src/lib.rs`
 - **Backend API**: `docs/backend-api.md`, `docs/openapi.yaml`
 - **TTL Logic**: `docs/ttl-logic.md`
 - **Mobile Passkeys**: `docs/passkeys.md`; mobile-specific flow now lives in [ethos-protocol/ethos-mobile](https://github.com/ethos-protocol/ethos-mobile) (`docs/mobile-passkey-flow.md`)

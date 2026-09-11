@@ -19,7 +19,7 @@ for var in "${REQUIRED_VARS[@]}"; do
 done
 
 echo "Building Heirloom-Protocol contracts..."
-cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/ttl_vault/Cargo.toml
-cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/zk_verifier/Cargo.toml
-cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/sbt/Cargo.toml
+cargo build --target wasm32-unknown-unknown --release --manifest-path Heirloom-contracts/ttl_vault/Cargo.toml
+cargo build --target wasm32-unknown-unknown --release --manifest-path Heirloom-contracts/zk_verifier/Cargo.toml
+cargo build --target wasm32-unknown-unknown --release --manifest-path Heirloom-contracts/sbt/Cargo.toml
 echo "Build complete."

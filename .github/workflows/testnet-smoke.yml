@@ -28,12 +28,12 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            contracts/target/
-          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('contracts/Cargo.lock') }}
+            Heirloom-contracts/target/
+          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('Heirloom-contracts/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-wasm-
 
       - name: Build contract WASM
-        working-directory: contracts
+        working-directory: Heirloom-contracts
         run: cargo build --package ttl-vault --target wasm32-unknown-unknown --release
 
       - name: Install Stellar CLI
@@ -90,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           CONTRACT_ID=$(stellar contract deploy \
-            --wasm contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm \
+            --wasm Heirloom-contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm \
             --source "smoke-admin-${KEY_SUFFIX}" \
             --network testnet)
           echo "CONTRACT_ID=${CONTRACT_ID}" >> "$GITHUB_ENV"
