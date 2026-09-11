@@ -86,16 +86,6 @@ async fn health_handler() -> Json<serde_json::Value> {
     }))
 }
 
-/// GET /api/encryption/keys — list all known encryption key versions (#101).
-async fn encryption_keys_handler(
-    State(state): State<AppState>,
-) -> Result<Json<serde_json::Value>, StatusCode> {
-    match state.db.list_encryption_key_versions() {
-        Ok(versions) => Ok(Json(serde_json::json!({ "keys": versions }))),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
-    }
-}
-
 async fn ready_handler(
     State(state): State<AppState>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
