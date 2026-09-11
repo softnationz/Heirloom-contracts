@@ -36,10 +36,11 @@ pub const RECOVERY_CODE_COUNT: u32 = 5;
 pub const RECOVERY_MAX_ATTEMPTS: u32 = 5;
 pub const RECOVERY_ATTEMPT_WINDOW_SECONDS: u64 = 3600;
 /// Maximum hops a composition graph walk (cycle check or resolution) may
-/// take before being treated as invalid. Matches ttl_vault's
-/// MAX_INHERITANCE_DEPTH, the equivalent bound for template-inheritance
-/// chain walks.
-pub const MAX_COMPOSITION_DEPTH: u32 = 16;
+/// take before being treated as invalid. This is the original value from
+/// d18959c ("implementcompostion"), where this constant was first declared
+/// alongside the code that uses it, before a later merge silently dropped
+/// the declaration while leaving the call sites intact.
+pub const MAX_COMPOSITION_DEPTH: u32 = 32;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
