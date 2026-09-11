@@ -137,9 +137,9 @@ mod passkey_expiry_notification_tests;
 #[cfg(test)]
 mod regression_tests;
 #[cfg(test)]
-mod slice_failover_tests;
-#[cfg(test)]
 mod slice_consensus_voting_tests;
+#[cfg(test)]
+mod slice_failover_tests;
 #[cfg(test)]
 mod slice_performance_tests;
 #[cfg(test)]
@@ -9578,9 +9578,7 @@ impl TtlVaultContract {
             // distinct. Replacing the stored vector below then makes the prior
             // generation unambiguously invalid, even when codes are regenerated
             // in the same ledger timestamp.
-            let code_number = vault_id
-                .wrapping_mul(timestamp)
-                .wrapping_add(i as u64);
+            let code_number = vault_id.wrapping_mul(timestamp).wrapping_add(i as u64);
             // soroban_sdk::String is an immutable host object with no
             // push_str/concat — build the full "code<digits>" byte sequence
             // in a fixed-size stack buffer first, then construct the String

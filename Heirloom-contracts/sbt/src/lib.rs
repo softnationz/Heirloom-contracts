@@ -2,9 +2,9 @@
 
 #[cfg(test)]
 mod atomic_release_tests;
+mod compression;
 #[cfg(test)]
 mod recovery_tests;
-mod compression;
 
 use crate::compression::{
     compress_metadata as compress_metadata_bytes, decompress_metadata as decompress_metadata_bytes,
@@ -890,10 +890,8 @@ impl SbtContract {
             .instance()
             .set(&DataKey::RecoveryCodes(sbt_id), &hashed_codes);
 
-        env.events().publish(
-            (RECOVERY_CODES_GENERATED_TOPIC, sbt_id),
-            hashed_codes.len(),
-        );
+        env.events()
+            .publish((RECOVERY_CODES_GENERATED_TOPIC, sbt_id), hashed_codes.len());
         plaintext_codes
     }
 
@@ -941,7 +939,9 @@ impl SbtContract {
             .set(&DataKey::Owner(sbt_id), &new_holder);
         // A delegation granted by the previous holder must not carry over to
         // the new holder, mirroring `batch_transfer_sbt_conditional`.
-        env.storage().instance().remove(&DataKey::Delegation(sbt_id));
+        env.storage()
+            .instance()
+            .remove(&DataKey::Delegation(sbt_id));
 
         env.events()
             .publish((RECOVERY_SUCCEEDED_TOPIC, sbt_id), new_holder);
@@ -1033,9 +1033,11 @@ impl SbtContract {
             if steps > MAX_COMPOSITION_DEPTH {
                 return true;
             }
-            if let Some(components) = env.storage().instance().get::<DataKey, CompositionComponents>(
-                &DataKey::CompositionComponents(current),
-            ) {
+            if let Some(components) = env
+                .storage()
+                .instance()
+                .get::<DataKey, CompositionComponents>(&DataKey::CompositionComponents(current))
+            {
                 for component in components.component_ids.iter() {
                     pending.push_back(component);
                 }
@@ -1055,9 +1057,11 @@ impl SbtContract {
             panic_with_error!(env, SbtError::InvalidCompositionGraph);
         }
         visited.set(current, true);
-        if let Some(components) = env.storage().instance().get::<DataKey, CompositionComponents>(
-            &DataKey::CompositionComponents(current),
-        ) {
+        if let Some(components) = env
+            .storage()
+            .instance()
+            .get::<DataKey, CompositionComponents>(&DataKey::CompositionComponents(current))
+        {
             for component in components.component_ids.iter() {
                 Self::load_owner(env, component);
                 resolved.push_back(component);
