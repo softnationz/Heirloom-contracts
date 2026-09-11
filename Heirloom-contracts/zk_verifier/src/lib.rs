@@ -43,6 +43,22 @@ pub const MAX_CREDENTIAL_CHAIN_DEPTH: u32 = 32;
 /// out by the same window. See docs/zk-verifier.md, "Scheduled Consistency
 /// Re-Checks".
 pub const CONSISTENCY_CHECK_INTERVAL: u64 = 30 * 24 * 60 * 60;
+/// Bit index into the field-mask recorded by
+/// [`ZkVerifierContract::redact_attestation_record`] /
+/// [`ZkVerifierContract::redact_credential_snapshot`]'s [`MaskingConfig`],
+/// identifying the `oracle` field as the one masked out. It is currently
+/// the only maskable field; the bit-mask shape (rather than a plain flag)
+/// leaves room for masking additional fields later without changing the
+/// `MaskingConfig` format.
+pub const ATTESTATION_RECORD_FIELD_ORACLE: u32 = 0;
+/// StrKey of the all-zero Ed25519 account, used as the placeholder `oracle`
+/// on a redacted attestation record / credential snapshot. Not a usable
+/// Stellar account (there is no corresponding private key), so it can never
+/// be mistaken for a genuine attesting oracle, but it is a valid `Address`
+/// value that round-trips through storage and events. See
+/// [`ZkVerifierContract::masked_oracle`].
+pub const MASKED_ORACLE_STRKEY: &str =
+    "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
 
 const VERIFY_CLAIM_TOPIC: soroban_sdk::Symbol = symbol_short!("vfy_claim");
 const VERIFY_CONDITIONAL_TOPIC: soroban_sdk::Symbol = symbol_short!("vfy_cond");
@@ -104,6 +120,10 @@ pub enum VerifierError {
     /// The caller is not permitted to view this credential's attestation
     /// record at its current privacy level.
     AccessDenied = 21,
+    /// No version exists with the given number for this credential (never
+    /// recorded, or since pruned by the MAX_CREDENTIAL_SNAPSHOTS retention
+    /// policy).
+    VersionNotFound = 22,
 }
 
 /// The on-chain format for a conditional ("prove X if Y, else prove Z")
@@ -838,6 +858,161 @@ impl ZkVerifierContract {
         }
     }
 
+    /// Returns the latest version number recorded for a credential (0 if it
+    /// has never been attested), regardless of whether earlier versions
+    /// have since been pruned. Not privacy-gated: a bare count exposes no
+    /// oracle or invalidation detail, mirroring
+    /// [`Self::get_credential_disputes`]'s ungated dispute count.
+    pub fn credential_version_count(env: Env, credential_id: u64) -> u32 {
+        env.storage()
+            .instance()
+            .get::<DataKey, Vec<u32>>(&DataKey::CredentialSnapshotVersions(credential_id))
+            .and_then(|versions| versions.last())
+            .unwrap_or(0)
+    }
+
+    /// Returns the credential's recorded state as of a specific version
+    /// number (1-based, monotonically increasing, never reused), or `None`
+    /// if that version was never recorded or has since been pruned. Same
+    /// [`PrivacyLevel`] access check as [`Self::get_credential_at_time`].
+    pub fn get_credential_version(
+        env: Env,
+        requester: Address,
+        credential_id: u64,
+        version: u32,
+    ) -> Option<CredentialSnapshot> {
+        requester.require_auth();
+        let snapshot = Self::load_snapshot_by_version(&env, credential_id, version)?;
+        Some(Self::gate_snapshot_for_privacy(
+            &env,
+            &requester,
+            credential_id,
+            snapshot,
+        ))
+    }
+
+    /// Returns the credential's attestation state as of `timestamp` (the
+    /// most recent snapshot at or before it), or `None` if no such snapshot
+    /// exists (including when the credential has no snapshots at all, or
+    /// every snapshot postdates the query). `requester` must authorize the
+    /// call and be permitted to view the credential under its current
+    /// [`PrivacyLevel`].
+    pub fn get_credential_at_time(
+        env: Env,
+        requester: Address,
+        credential_id: u64,
+        timestamp: u64,
+    ) -> Option<CredentialSnapshot> {
+        requester.require_auth();
+        let snapshot = Self::load_snapshot_at_or_before(&env, credential_id, timestamp)?;
+        Some(Self::gate_snapshot_for_privacy(
+            &env,
+            &requester,
+            credential_id,
+            snapshot,
+        ))
+    }
+
+    /// Compares two recorded versions of a credential and reports what
+    /// changed between them. `from_version` and `to_version` need not be
+    /// adjacent or chronologically ordered. Panics with `VersionNotFound`
+    /// if either version is unknown or has been pruned. Same
+    /// [`PrivacyLevel`] access check as [`Self::get_credential_at_time`],
+    /// applied independently to each version.
+    pub fn diff_credential_versions(
+        env: Env,
+        requester: Address,
+        credential_id: u64,
+        from_version: u32,
+        to_version: u32,
+    ) -> CredentialVersionDiff {
+        requester.require_auth();
+        let from = Self::load_snapshot_by_version(&env, credential_id, from_version)
+            .unwrap_or_else(|| panic_with_error!(&env, VerifierError::VersionNotFound));
+        let to = Self::load_snapshot_by_version(&env, credential_id, to_version)
+            .unwrap_or_else(|| panic_with_error!(&env, VerifierError::VersionNotFound));
+        let from = Self::gate_snapshot_for_privacy(&env, &requester, credential_id, from);
+        let to = Self::gate_snapshot_for_privacy(&env, &requester, credential_id, to);
+
+        CredentialVersionDiff {
+            credential_id,
+            from_version,
+            to_version,
+            from_timestamp: from.timestamp,
+            to_timestamp: to.timestamp,
+            oracle_changed: from.oracle != to.oracle,
+            previous_oracle: from.oracle,
+            current_oracle: to.oracle,
+            invalidated_changed: from.invalidated != to.invalidated,
+            previous_invalidated: from.invalidated,
+            current_invalidated: to.invalidated,
+        }
+    }
+
+    /// Returns `credential_id`'s immediate parent, or `None` if it is a
+    /// root — either because it was created via [`Self::attest`], or
+    /// because `credential_id` was never attested at all (unknown and root
+    /// ids are indistinguishable here, matching [`Self::load_parent`]'s
+    /// existing internal semantics). Not privacy-gated: it only exposes an
+    /// id relationship, not attestation or invalidation detail.
+    pub fn get_credential_parent(env: Env, credential_id: u64) -> Option<u64> {
+        Self::load_parent(&env, credential_id)
+    }
+
+    /// Returns a credential's full ancestry, starting with itself and
+    /// walking up to its root: `[credential_id, parent, grandparent, ...]`.
+    /// An unknown `credential_id` returns `[credential_id]` alone, since it
+    /// has no recorded parent. Not privacy-gated, like
+    /// [`Self::get_credential_parent`].
+    ///
+    /// Defensively bounded at `MAX_CREDENTIAL_CHAIN_DEPTH` hops, matching
+    /// [`Self::validate_credential_chain`]'s bound on write. Every chain
+    /// reachable here was already validated against that same bound by
+    /// [`Self::create_derived_credential`] at creation time, so the bound
+    /// should never actually trigger in practice — it exists only to keep
+    /// this query's cost bounded even against unexpected on-chain state.
+    pub fn get_credential_chain(env: Env, credential_id: u64) -> Vec<u64> {
+        let mut chain = Vec::new(&env);
+        chain.push_back(credential_id);
+
+        let mut current = credential_id;
+        let mut depth: u32 = 0;
+        while let Some(parent) = Self::load_parent(&env, current) {
+            chain.push_back(parent);
+            current = parent;
+            depth += 1;
+            if depth > MAX_CREDENTIAL_CHAIN_DEPTH {
+                break;
+            }
+        }
+        chain
+    }
+
+    /// Returns whether a credential and every one of its ancestors is
+    /// currently valid (none invalidated by an upheld dispute). An unknown
+    /// `credential_id` is vacuously valid, matching
+    /// [`Self::is_credential_invalidated`]'s "absence means not invalidated"
+    /// semantics. Not privacy-gated, like [`Self::get_credential_parent`].
+    pub fn is_credential_chain_valid(env: Env, credential_id: u64) -> bool {
+        let mut current = credential_id;
+        let mut depth: u32 = 0;
+        loop {
+            if Self::is_credential_invalidated(env.clone(), current) {
+                return false;
+            }
+            match Self::load_parent(&env, current) {
+                Some(parent) => {
+                    current = parent;
+                    depth += 1;
+                    if depth > MAX_CREDENTIAL_CHAIN_DEPTH {
+                        return true;
+                    }
+                }
+                None => return true,
+            }
+        }
+    }
+
     // ---- helpers ----
 
     /// Structural format check for `verify_lattice_proof`'s input: `proof`
@@ -966,6 +1141,7 @@ impl ZkVerifierContract {
         AttestationRecord {
             credential_id: record.credential_id,
             oracle: Self::masked_oracle(env),
+            next_check_due: record.next_check_due,
         }
     }
 
@@ -977,6 +1153,125 @@ impl ZkVerifierContract {
     /// through storage and events.
     fn masked_oracle(env: &Env) -> Address {
         Address::from_string(&String::from_str(env, MASKED_ORACLE_STRKEY))
+    }
+
+    /// Returns a copy of `snapshot` with its `oracle` field masked out, the
+    /// [`CredentialSnapshot`] analog of [`Self::redact_attestation_record`]
+    /// — same trigger (an unauthorized caller at `PrivacyLevel::Confidential`),
+    /// same masked value, same on-chain audit trail via
+    /// `DataKey::AttestationMasking`.
+    fn redact_credential_snapshot(env: &Env, snapshot: &CredentialSnapshot) -> CredentialSnapshot {
+        let field_mask = 1u32 << ATTESTATION_RECORD_FIELD_ORACLE;
+        env.storage().instance().set(
+            &DataKey::AttestationMasking(snapshot.credential_id),
+            &MaskingConfig {
+                masked_fields: env
+                    .crypto()
+                    .sha256(&Bytes::from_array(env, &field_mask.to_le_bytes()))
+                    .into(),
+                version: 1,
+            },
+        );
+        CredentialSnapshot {
+            credential_id: snapshot.credential_id,
+            oracle: Self::masked_oracle(env),
+            invalidated: snapshot.invalidated,
+            timestamp: snapshot.timestamp,
+            version: snapshot.version,
+        }
+    }
+
+    /// Applies the same [`PrivacyLevel`] access check [`Self::get_attestation`]
+    /// uses, to a [`CredentialSnapshot`] instead of an [`AttestationRecord`]:
+    /// `Public` passes it through, `Internal` requires the admin or a
+    /// registered oracle (else panics `AccessDenied`), and `Confidential`
+    /// returns a redacted copy (via [`Self::redact_credential_snapshot`])
+    /// unless the caller is the admin.
+    fn gate_snapshot_for_privacy(
+        env: &Env,
+        requester: &Address,
+        credential_id: u64,
+        snapshot: CredentialSnapshot,
+    ) -> CredentialSnapshot {
+        match Self::credential_privacy(env.clone(), credential_id) {
+            PrivacyLevel::Public => snapshot,
+            PrivacyLevel::Internal => {
+                if Self::is_admin(env, requester) || Self::is_registered_oracle(env, requester) {
+                    snapshot
+                } else {
+                    panic_with_error!(env, VerifierError::AccessDenied);
+                }
+            }
+            PrivacyLevel::Confidential => {
+                if Self::is_admin(env, requester) {
+                    snapshot
+                } else {
+                    Self::redact_credential_snapshot(env, &snapshot)
+                }
+            }
+        }
+    }
+
+    /// Looks up the snapshot recorded at `version` for `credential_id`, via
+    /// the `CredentialSnapshotVersions` index kept in lockstep with
+    /// `CredentialSnapshotTimestamps` by [`Self::record_credential_snapshot`].
+    /// Returns `None` if `credential_id` has no snapshots, or `version` was
+    /// never recorded, or has since been pruned.
+    fn load_snapshot_by_version(
+        env: &Env,
+        credential_id: u64,
+        version: u32,
+    ) -> Option<CredentialSnapshot> {
+        let versions = env
+            .storage()
+            .instance()
+            .get::<DataKey, Vec<u32>>(&DataKey::CredentialSnapshotVersions(credential_id))?;
+        let index = versions.first_index_of(version)?;
+        let timestamps = env
+            .storage()
+            .instance()
+            .get::<DataKey, Vec<u64>>(&DataKey::CredentialSnapshotTimestamps(credential_id))?;
+        let timestamp = timestamps.get(index)?;
+        env.storage()
+            .instance()
+            .get(&DataKey::CredentialSnapshot(credential_id, timestamp))
+    }
+
+    /// Looks up the snapshot at the rightmost retained timestamp `<=
+    /// timestamp`, via binary search over `CredentialSnapshotTimestamps`
+    /// (append-only and so always ascending-sorted, per
+    /// [`Self::record_credential_snapshot`]). Returns `None` if
+    /// `credential_id` has no snapshots, or every retained snapshot
+    /// postdates `timestamp`.
+    fn load_snapshot_at_or_before(
+        env: &Env,
+        credential_id: u64,
+        timestamp: u64,
+    ) -> Option<CredentialSnapshot> {
+        let timestamps = env
+            .storage()
+            .instance()
+            .get::<DataKey, Vec<u64>>(&DataKey::CredentialSnapshotTimestamps(credential_id))?;
+        if timestamps.is_empty() {
+            return None;
+        }
+        let mut lo: u32 = 0;
+        let mut hi: u32 = timestamps.len();
+        while lo < hi {
+            let mid = lo + (hi - lo) / 2;
+            if timestamps.get(mid).unwrap() <= timestamp {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        if lo == 0 {
+            return None;
+        }
+        let found_timestamp = timestamps.get(lo - 1).unwrap();
+        env.storage()
+            .instance()
+            .get(&DataKey::CredentialSnapshot(credential_id, found_timestamp))
     }
 
     /// Returns the existing credential_id for `(proof_hash, claim_hash)` if
