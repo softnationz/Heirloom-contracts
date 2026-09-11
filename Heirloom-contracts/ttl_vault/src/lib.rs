@@ -9581,11 +9581,18 @@ impl TtlVaultContract {
             let code_number = vault_id
                 .wrapping_mul(timestamp)
                 .wrapping_add(i as u64);
-            let code_str = String::from_str(&env, "code");
-            let mut suffix = String::from_str(&env, "");
+            // soroban_sdk::String is an immutable host object with no
+            // push_str/concat — build the full "code<digits>" byte sequence
+            // in a fixed-size stack buffer first, then construct the String
+            // once. u64::MAX has 20 decimal digits, so 4 + 20 = 24 bytes
+            // always fits.
+            let mut buf = [0u8; 24];
+            buf[..4].copy_from_slice(b"code");
+            let mut len = 4usize;
             let mut remaining = code_number;
             if remaining == 0 {
-                suffix.push_str(&String::from_str(&env, "0"));
+                buf[len] = b'0';
+                len += 1;
             } else {
                 let mut digits = [0u8; 20];
                 let mut digit_count = 0usize;
@@ -9596,10 +9603,11 @@ impl TtlVaultContract {
                 }
                 while digit_count > 0 {
                     digit_count -= 1;
-                    suffix.push_str(&String::from_bytes(&env, &Bytes::from_array(&env, &[digits[digit_count]])));
+                    buf[len] = digits[digit_count];
+                    len += 1;
                 }
             }
-            let code_str = code_str.concat(&suffix);
+            let code_str = String::from_bytes(&env, &buf[..len]);
             codes.push_back(BackupCode {
                 code: code_str.clone(),
                 used: false,
