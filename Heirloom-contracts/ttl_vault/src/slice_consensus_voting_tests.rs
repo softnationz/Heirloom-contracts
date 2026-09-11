@@ -104,7 +104,9 @@ fn test_finalization_below_quorum_is_rejected() {
 
     // Proposal must remain Pending so voting can continue.
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, 1, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, 1, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Pending);
     assert_eq!(proposal.approve_count, 2);
@@ -162,7 +164,9 @@ fn test_below_quorum_then_reaches_quorum_resolves() {
     assert_eq!(resolved, Ok(true));
 
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, slice_id, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, slice_id, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Approved);
 }
@@ -185,7 +189,9 @@ fn test_finalization_at_quorum_resolves() {
     assert_eq!(result, Ok(true));
 
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, 1, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, 1, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Approved);
 }
@@ -235,7 +241,9 @@ fn test_finalization_at_quorum_with_majority_reject_resolves_rejected() {
     assert_eq!(result, Ok(true));
 
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, slice_id, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, slice_id, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Rejected);
 }
@@ -258,7 +266,9 @@ fn test_finalization_above_quorum_resolves() {
     assert_eq!(result, Ok(true));
 
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, 1, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, 1, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Approved);
 }
@@ -293,7 +303,9 @@ fn test_default_quorum_allows_single_vote_finalization() {
     assert_eq!(result, Ok(true));
 
     let proposal = env
-        .as_contract(&contract_id, || get_modification_proposal(&env, slice_id, proposal_id))
+        .as_contract(&contract_id, || {
+            get_modification_proposal(&env, slice_id, proposal_id)
+        })
         .unwrap();
     assert_eq!(proposal.status, ProposalStatus::Approved);
 }

@@ -228,9 +228,12 @@ pub fn set_voting_config(env: &Env, min_quorum: u32) {
 /// when no explicit configuration has been stored.
 pub fn get_voting_config(env: &Env) -> VotingConfig {
     let key = VotingKey::VotingConfig;
-    env.storage().persistent().get(&key).unwrap_or(VotingConfig {
-        min_quorum: DEFAULT_MIN_QUORUM,
-    })
+    env.storage()
+        .persistent()
+        .get(&key)
+        .unwrap_or(VotingConfig {
+            min_quorum: DEFAULT_MIN_QUORUM,
+        })
 }
 
 /// Check if an address is a registered attestor.

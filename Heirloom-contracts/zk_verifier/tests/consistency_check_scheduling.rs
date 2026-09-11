@@ -86,9 +86,11 @@ fn test_due_check_remains_due_until_rescheduled() {
     env.ledger().set_timestamp(1_000);
     let credential_id = attested_credential(&env, &client);
 
-    env.ledger().set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
+    env.ledger()
+        .set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
     assert!(client.is_consistency_check_due(&credential_id));
-    env.ledger().set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL + 5_000);
+    env.ledger()
+        .set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL + 5_000);
     assert!(
         client.is_consistency_check_due(&credential_id),
         "still due until rescheduled"
@@ -117,13 +119,15 @@ fn test_reattestation_reschedules_window() {
     let claim = bytes!(&env, 0xcafebabe);
     let credential_id = client.attest(&oracle, &proof, &claim);
 
-    env.ledger().set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL + 10);
+    env.ledger()
+        .set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL + 10);
     assert!(client.is_consistency_check_due(&credential_id));
 
     env.ledger().set_timestamp(5_000);
     client.attest(&oracle, &proof, &claim);
     assert!(!client.is_consistency_check_due(&credential_id));
-    env.ledger().set_timestamp(5_000 + CONSISTENCY_CHECK_INTERVAL);
+    env.ledger()
+        .set_timestamp(5_000 + CONSISTENCY_CHECK_INTERVAL);
     assert!(client.is_consistency_check_due(&credential_id));
 }
 
@@ -144,7 +148,8 @@ fn test_derived_credential_schedules_check() {
     );
 
     assert!(!client.is_consistency_check_due(&child));
-    env.ledger().set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
+    env.ledger()
+        .set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
     assert!(client.is_consistency_check_due(&child));
 }
 
@@ -176,7 +181,10 @@ fn test_due_check_emits_event_with_id_and_due_at() {
             .map(|s: soroban_sdk::Symbol| s == soroban_sdk::symbol_short!("cons_due"))
             .unwrap_or(false)
     });
-    assert!(event.is_some(), "cons_due event not emitted when check is due");
+    assert!(
+        event.is_some(),
+        "cons_due event not emitted when check is due"
+    );
     let data: (u64, u64) = event.unwrap().2.clone().into_val(&env);
     assert_eq!(data, (credential_id, due_at));
 }
@@ -191,7 +199,8 @@ fn test_reschedule_advances_window() {
     env.ledger().set_timestamp(1_000);
     let credential_id = attested_credential(&env, &client);
 
-    env.ledger().set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
+    env.ledger()
+        .set_timestamp(1_000 + CONSISTENCY_CHECK_INTERVAL);
     assert!(client.is_consistency_check_due(&credential_id));
 
     // Worker completes the check and reschedules from a later timestamp.
@@ -202,9 +211,11 @@ fn test_reschedule_advances_window() {
         "rescheduled check must not be immediately due"
     );
 
-    env.ledger().set_timestamp(2_000 + CONSISTENCY_CHECK_INTERVAL - 1);
+    env.ledger()
+        .set_timestamp(2_000 + CONSISTENCY_CHECK_INTERVAL - 1);
     assert!(!client.is_consistency_check_due(&credential_id));
-    env.ledger().set_timestamp(2_000 + CONSISTENCY_CHECK_INTERVAL);
+    env.ledger()
+        .set_timestamp(2_000 + CONSISTENCY_CHECK_INTERVAL);
     assert!(client.is_consistency_check_due(&credential_id));
 }
 
