@@ -714,7 +714,10 @@ mod tests {
         let ts = ts_now();
         let result = verify_webhook_signature("body", "secret", None, Some(&ts));
         assert!(!result.valid);
-        assert!(result.reason.unwrap().contains("missing X-Heirloom-Signature"));
+        assert!(result
+            .reason
+            .unwrap()
+            .contains("missing X-Heirloom-Signature"));
     }
 
     #[test]

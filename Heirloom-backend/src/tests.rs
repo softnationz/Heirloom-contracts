@@ -569,7 +569,9 @@ async fn test_subscription_endpoints() {
 
 #[cfg(test)]
 mod notification_delivery_tests {
-    use heirloom_protocol_backend::models::{DeliveryStatus, NotificationType, RegisterTokenRequest};
+    use heirloom_protocol_backend::models::{
+        DeliveryStatus, NotificationType, RegisterTokenRequest,
+    };
     use heirloom_protocol_backend::notifications::{
         create_delivery_store, create_prefs_store, create_schedule_store, create_token_store,
         FcmClient, NotificationService,

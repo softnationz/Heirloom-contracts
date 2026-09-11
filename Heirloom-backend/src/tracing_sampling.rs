@@ -251,7 +251,10 @@ impl TraceSampler {
             out,
             "# HELP heirloom_trace_requests_evaluated_total Requests evaluated for sampling"
         );
-        let _ = writeln!(out, "# TYPE heirloom_trace_requests_evaluated_total counter");
+        let _ = writeln!(
+            out,
+            "# TYPE heirloom_trace_requests_evaluated_total counter"
+        );
         let _ = writeln!(out, "heirloom_trace_requests_evaluated_total {evaluated}");
 
         let _ = writeln!(
