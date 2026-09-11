@@ -14,7 +14,7 @@ fn setup() -> (Env, Address, Address) {
 }
 
 fn mint(client: &SbtContractClient, owner: &Address) -> u64 {
-    client.mint(owner, &String::from_str(client.env(), "token"))
+    client.mint(owner, &String::from_str(&client.env, "token"))
 }
 
 #[test]

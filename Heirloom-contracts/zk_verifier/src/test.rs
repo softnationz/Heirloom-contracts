@@ -205,7 +205,9 @@ fn test_claim_exceeds_max_size_panics() {
 
 // ── #818: Event emission tests ────────────────────────────────────────────────
 
-/// verify_claim with an attested proof must emit exactly one vfy_claim event.
+/// verify_claim with an attested proof must emit exactly two events: its own
+/// vfy_claim, and record_verification's audit_log (called whenever
+/// verify_claim's result is true).
 #[test]
 fn test_verify_claim_emits_event_on_true_result() {
     let (env, _, client) = setup();
@@ -216,11 +218,12 @@ fn test_verify_claim_emits_event_on_true_result() {
     let claim = bytes!(&env, 0xcafebabe);
     client.attest(&oracle, &proof, &claim);
 
-    // attest() does not itself publish any events, so verify_claim() is the
-    // only event source here.
+    // attest() does not itself publish any events, so verify_claim() (plus
+    // the audit-log entry it records on a true result) is the only event
+    // source here.
     let result = client.verify_claim(&proof, &claim);
     assert!(result);
-    assert_eq!(env.events().all().len(), 1);
+    assert_eq!(env.events().all().len(), 2);
 }
 
 /// verify_claim with an unattested proof must emit exactly one vfy_claim
@@ -272,7 +275,7 @@ fn test_attest_returns_credential_id() {
 
 /// Disputing a credential id that was never attested must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #8)")]
+#[should_panic(expected = "Error(Contract, #12)")]
 fn test_dispute_unknown_credential_panics() {
     let (env, _, client) = setup();
     let initiator = Address::generate(&env);
@@ -282,7 +285,7 @@ fn test_dispute_unknown_credential_panics() {
 
 /// An empty dispute reason must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #13)")]
+#[should_panic(expected = "Error(Contract, #27)")]
 fn test_dispute_empty_reason_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -298,7 +301,7 @@ fn test_dispute_empty_reason_panics() {
 
 /// Filing a second dispute while one is still open must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #12)")]
+#[should_panic(expected = "Error(Contract, #26)")]
 fn test_duplicate_open_dispute_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -334,7 +337,7 @@ fn test_non_oracle_cannot_vote() {
 
 /// The same oracle voting twice on one dispute must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #11)")]
+#[should_panic(expected = "Error(Contract, #25)")]
 fn test_double_vote_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -353,7 +356,7 @@ fn test_double_vote_panics() {
 
 /// Voting on an already-resolved dispute must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #10)")]
+#[should_panic(expected = "Error(Contract, #24)")]
 fn test_vote_after_resolution_panics() {
     let (env, _, client) = setup();
     let oracles = register_oracles(&env, &client, 3);
@@ -489,7 +492,7 @@ fn test_admin_configurable_dispute_threshold() {
 
 /// A zero threshold is rejected.
 #[test]
-#[should_panic(expected = "Error(Contract, #15)")]
+#[should_panic(expected = "Error(Contract, #29)")]
 fn test_zero_threshold_rejected() {
     let (_, _, client) = setup();
     client.set_dispute_threshold(&0u32);
@@ -719,7 +722,7 @@ fn test_credential_privacy_defaults_to_public() {
 
 /// Setting privacy on a credential id that was never attested must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #8)")]
+#[should_panic(expected = "Error(Contract, #12)")]
 fn test_set_credential_privacy_unknown_credential_panics() {
     let (_, _, client) = setup();
     client.set_credential_privacy(&999u64, &PrivacyLevel::Internal);
@@ -770,7 +773,7 @@ fn test_internal_privacy_allows_admin_and_any_oracle() {
 /// An `Internal` credential is not readable by an address that is neither
 /// the admin nor a registered oracle.
 #[test]
-#[should_panic(expected = "Error(Contract, #16)")]
+#[should_panic(expected = "Error(Contract, #21)")]
 fn test_internal_privacy_denies_stranger() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -805,7 +808,7 @@ fn test_confidential_privacy_allows_admin() {
 /// `Internal` and excludes everyone but the admin, including the oracle that
 /// attested the credential in the first place.
 #[test]
-#[should_panic(expected = "Error(Contract, #16)")]
+#[should_panic(expected = "Error(Contract, #21)")]
 fn test_confidential_privacy_denies_attesting_oracle() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1010,7 +1013,7 @@ fn test_diff_credential_versions_reports_invalidation_change() {
 
 /// Diffing a version that was never recorded panics with VersionNotFound.
 #[test]
-#[should_panic(expected = "Error(Contract, #17)")]
+#[should_panic(expected = "Error(Contract, #22)")]
 fn test_diff_credential_versions_unknown_version_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1026,7 +1029,7 @@ fn test_diff_credential_versions_unknown_version_panics() {
 /// get_credential_version respects the same privacy gating as
 /// get_credential_at_time: a stranger is denied on an Internal credential.
 #[test]
-#[should_panic(expected = "Error(Contract, #16)")]
+#[should_panic(expected = "Error(Contract, #21)")]
 fn test_get_credential_version_denies_stranger_on_internal_privacy() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1115,7 +1118,7 @@ fn test_credential_chain_multi_level() {
 
 /// Deriving from a parent_id that was never attested must panic.
 #[test]
-#[should_panic(expected = "Error(Contract, #8)")]
+#[should_panic(expected = "Error(Contract, #12)")]
 fn test_create_derived_credential_unknown_parent_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1139,7 +1142,7 @@ fn test_create_derived_credential_requires_registered_oracle() {
 /// Once the immediate parent is invalidated by an upheld dispute, no new
 /// credential may be derived from it.
 #[test]
-#[should_panic(expected = "Error(Contract, #18)")]
+#[should_panic(expected = "Error(Contract, #16)")]
 fn test_create_derived_credential_invalidated_parent_panics() {
     let (env, _, client) = setup();
     let oracles = register_oracles(&env, &client, 3);
@@ -1167,7 +1170,7 @@ fn test_create_derived_credential_invalidated_parent_panics() {
 /// create_derived_credential must still panic — a certificate built on a
 /// degree is only as good as the transcript the degree itself rests on.
 #[test]
-#[should_panic(expected = "Error(Contract, #18)")]
+#[should_panic(expected = "Error(Contract, #16)")]
 fn test_create_derived_credential_recursive_validation_catches_grandparent() {
     let (env, _, client) = setup();
     let oracles = register_oracles(&env, &client, 3);
@@ -1208,7 +1211,7 @@ fn test_create_derived_credential_recursive_validation_catches_grandparent() {
 /// (proof, claim) bytes back in as the derived credential's bytes dedups to
 /// the same credential_id as the requested parent.
 #[test]
-#[should_panic(expected = "Error(Contract, #20)")]
+#[should_panic(expected = "Error(Contract, #13)")]
 fn test_create_derived_credential_self_referential_parent_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1224,7 +1227,7 @@ fn test_create_derived_credential_self_referential_parent_panics() {
 /// same (proof, claim) pair under a different parent must panic rather than
 /// silently rewriting the hierarchy.
 #[test]
-#[should_panic(expected = "Error(Contract, #21)")]
+#[should_panic(expected = "Error(Contract, #14)")]
 fn test_create_derived_credential_parent_already_set_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);
@@ -1263,7 +1266,7 @@ fn test_create_derived_credential_idempotent_on_same_parent() {
 /// A parent chain exceeding MAX_CREDENTIAL_CHAIN_DEPTH hops is rejected
 /// rather than allowing unbounded recursive validation.
 #[test]
-#[should_panic(expected = "Error(Contract, #19)")]
+#[should_panic(expected = "Error(Contract, #15)")]
 fn test_create_derived_credential_chain_too_deep_panics() {
     let (env, _, client) = setup();
     let oracle = Address::generate(&env);

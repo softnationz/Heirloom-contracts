@@ -2,7 +2,11 @@
 
 #[cfg(test)]
 mod atomic_release_tests;
+#[cfg(test)]
+mod composition_tests;
 mod compression;
+#[cfg(test)]
+mod compression_tests;
 #[cfg(test)]
 mod recovery_tests;
 
