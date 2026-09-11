@@ -35,6 +35,11 @@ pub const RECOVERY_CODE_COUNT: u32 = 5;
 /// Recovery attempts allowed per `RECOVERY_ATTEMPT_WINDOW_SECONDS` window, per SBT.
 pub const RECOVERY_MAX_ATTEMPTS: u32 = 5;
 pub const RECOVERY_ATTEMPT_WINDOW_SECONDS: u64 = 3600;
+/// Maximum hops a composition graph walk (cycle check or resolution) may
+/// take before being treated as invalid. Matches ttl_vault's
+/// MAX_INHERITANCE_DEPTH, the equivalent bound for template-inheritance
+/// chain walks.
+pub const MAX_COMPOSITION_DEPTH: u32 = 16;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -96,6 +101,9 @@ pub enum SbtError {
     NoRecoveryCodes = 27,
     /// Recovery attempts have exceeded the allowed rate for the current window.
     RecoveryRateLimited = 28,
+    /// A proposed composition would create a cycle, or the graph walk
+    /// needed to check that exceeded MAX_COMPOSITION_DEPTH hops.
+    InvalidCompositionGraph = 29,
 }
 
 /// Storage key discriminants. All SBT state is keyed by `sbt_id`.
