@@ -57,8 +57,7 @@ pub const ATTESTATION_RECORD_FIELD_ORACLE: u32 = 0;
 /// be mistaken for a genuine attesting oracle, but it is a valid `Address`
 /// value that round-trips through storage and events. See
 /// [`ZkVerifierContract::masked_oracle`].
-pub const MASKED_ORACLE_STRKEY: &str =
-    "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
+pub const MASKED_ORACLE_STRKEY: &str = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
 
 const VERIFY_CLAIM_TOPIC: soroban_sdk::Symbol = symbol_short!("vfy_claim");
 const VERIFY_CONDITIONAL_TOPIC: soroban_sdk::Symbol = symbol_short!("vfy_cond");
@@ -66,6 +65,8 @@ const VERIFY_LATTICE_TOPIC: soroban_sdk::Symbol = symbol_short!("vfy_latt");
 const AUDIT_LOG_TOPIC: soroban_sdk::Symbol = symbol_short!("audit_log");
 const PROOF_MASKED_TOPIC: soroban_sdk::Symbol = symbol_short!("proof_msk");
 const CONSISTENCY_DUE_TOPIC: soroban_sdk::Symbol = symbol_short!("cons_due");
+const DISPUTE_OPENED_TOPIC: soroban_sdk::Symbol = symbol_short!("disp_open");
+const DISPUTE_RESOLVED_TOPIC: soroban_sdk::Symbol = symbol_short!("disp_res");
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -124,6 +125,20 @@ pub enum VerifierError {
     /// recorded, or since pruned by the MAX_CREDENTIAL_SNAPSHOTS retention
     /// policy).
     VersionNotFound = 22,
+    /// No dispute exists with the given id.
+    DisputeNotFound = 23,
+    /// The dispute has already been resolved (Upheld or Rejected).
+    DisputeNotOpen = 24,
+    /// This oracle already voted on this dispute.
+    AlreadyVoted = 25,
+    /// A dispute is already open for this credential.
+    DisputeAlreadyOpen = 26,
+    /// Dispute reason bytes were empty.
+    EmptyReason = 27,
+    /// Dispute reason bytes exceed MAX_REASON_SIZE.
+    ReasonTooLarge = 28,
+    /// Dispute threshold must be greater than zero.
+    InvalidThreshold = 29,
 }
 
 /// The on-chain format for a conditional ("prove X if Y, else prove Z")
@@ -858,6 +873,224 @@ impl ZkVerifierContract {
         }
     }
 
+    /// Files a dispute against a credential (an attestation, addressed by
+    /// the id returned from [`Self::attest`]). Anyone may call this —
+    /// `initiator` need not be a registered oracle — but must authorize the
+    /// call. Only one dispute may be open per credential at a time. Returns
+    /// the new dispute_id.
+    ///
+    /// Panics with `CredentialNotFound` if `credential_id` was never
+    /// attested, `EmptyReason`/`ReasonTooLarge` if `reason` is empty or
+    /// exceeds `MAX_REASON_SIZE`, or `DisputeAlreadyOpen` if a dispute
+    /// against this credential is already open.
+    pub fn initiate_credential_dispute(
+        env: Env,
+        credential_id: u64,
+        initiator: Address,
+        reason: Bytes,
+    ) -> u64 {
+        initiator.require_auth();
+
+        if !env
+            .storage()
+            .instance()
+            .has(&DataKey::CredentialHashes(credential_id))
+        {
+            panic_with_error!(&env, VerifierError::CredentialNotFound);
+        }
+        if reason.is_empty() {
+            panic_with_error!(&env, VerifierError::EmptyReason);
+        }
+        if reason.len() > MAX_REASON_SIZE {
+            panic_with_error!(&env, VerifierError::ReasonTooLarge);
+        }
+        if env
+            .storage()
+            .instance()
+            .has(&DataKey::CredentialOpenDispute(credential_id))
+        {
+            panic_with_error!(&env, VerifierError::DisputeAlreadyOpen);
+        }
+
+        let dispute_id = env
+            .storage()
+            .instance()
+            .get::<DataKey, u64>(&DataKey::DisputeCount)
+            .unwrap_or(0)
+            + 1;
+        env.storage()
+            .instance()
+            .set(&DataKey::DisputeCount, &dispute_id);
+
+        let dispute = Dispute {
+            id: dispute_id,
+            credential_id,
+            initiator,
+            reason,
+            status: DisputeStatus::Open,
+            votes_for: 0,
+            votes_against: 0,
+            created_at: env.ledger().timestamp(),
+            resolved_at: 0,
+        };
+        env.storage()
+            .instance()
+            .set(&DataKey::DisputeRecord(dispute_id), &dispute);
+        env.storage()
+            .instance()
+            .set(&DataKey::CredentialOpenDispute(credential_id), &dispute_id);
+
+        let mut history = env
+            .storage()
+            .instance()
+            .get::<DataKey, Vec<u64>>(&DataKey::CredentialDisputeHistory(credential_id))
+            .unwrap_or_else(|| Vec::new(&env));
+        history.push_back(dispute_id);
+        env.storage()
+            .instance()
+            .set(&DataKey::CredentialDisputeHistory(credential_id), &history);
+
+        env.events()
+            .publish((DISPUTE_OPENED_TOPIC, credential_id), dispute_id);
+
+        dispute_id
+    }
+
+    /// A registered oracle votes on an open dispute: `true` asserts the
+    /// credential is invalid, `false` asserts it remains valid. Each oracle
+    /// gets one vote per dispute. Once either side reaches
+    /// [`Self::dispute_threshold`] concurring votes, the dispute resolves
+    /// immediately:
+    ///
+    /// - **Upheld** (invalid votes reach the threshold first): the
+    ///   credential is marked invalidated — [`Self::verify_claim`] now
+    ///   returns `false` for it, even though the attesting oracle remains
+    ///   registered.
+    /// - **Rejected** (valid votes reach the threshold first): the
+    ///   credential's invalidated status is unaffected.
+    ///
+    /// Either way, a [`CredentialSnapshot`] is recorded via
+    /// [`Self::record_credential_snapshot`] — docs/zk-verifier.md,
+    /// "Credential Version History" specifies that a dispute *resolving*
+    /// (Upheld or Rejected) is itself a recorded state change, distinct
+    /// from whether `invalidated` actually flips.
+    ///
+    /// Panics with `DisputeNotFound` if `dispute_id` is unknown,
+    /// `DisputeNotOpen` if it has already resolved, `OracleNotFound` if
+    /// `voter` is not a currently-registered oracle, or `AlreadyVoted` if
+    /// `voter` already voted on this dispute.
+    pub fn vote_on_dispute(env: Env, dispute_id: u64, voter: Address, vote: bool) {
+        let mut dispute: Dispute = env
+            .storage()
+            .instance()
+            .get(&DataKey::DisputeRecord(dispute_id))
+            .unwrap_or_else(|| panic_with_error!(&env, VerifierError::DisputeNotFound));
+
+        if dispute.status != DisputeStatus::Open {
+            panic_with_error!(&env, VerifierError::DisputeNotOpen);
+        }
+
+        Self::require_registered_oracle(&env, &voter);
+        voter.require_auth();
+
+        let vote_key = DataKey::DisputeVote(dispute_id, voter.clone());
+        if env.storage().instance().has(&vote_key) {
+            panic_with_error!(&env, VerifierError::AlreadyVoted);
+        }
+        env.storage().instance().set(&vote_key, &vote);
+
+        if vote {
+            dispute.votes_for += 1;
+        } else {
+            dispute.votes_against += 1;
+        }
+
+        let threshold = Self::dispute_threshold(env.clone());
+        let resolution = if dispute.votes_for >= threshold {
+            Some(true)
+        } else if dispute.votes_against >= threshold {
+            Some(false)
+        } else {
+            None
+        };
+
+        if let Some(upheld) = resolution {
+            dispute.status = if upheld {
+                DisputeStatus::Upheld
+            } else {
+                DisputeStatus::Rejected
+            };
+            dispute.resolved_at = env.ledger().timestamp();
+            env.storage()
+                .instance()
+                .remove(&DataKey::CredentialOpenDispute(dispute.credential_id));
+            if upheld {
+                env.storage().instance().set(
+                    &DataKey::CredentialInvalidated(dispute.credential_id),
+                    &true,
+                );
+            }
+            if let Some(record) = Self::load_attestation_record(&env, dispute.credential_id) {
+                Self::record_credential_snapshot(
+                    &env,
+                    dispute.credential_id,
+                    record.oracle,
+                    upheld,
+                );
+            }
+            env.events().publish(
+                (DISPUTE_RESOLVED_TOPIC, dispute.credential_id),
+                (dispute_id, upheld),
+            );
+        }
+
+        env.storage()
+            .instance()
+            .set(&DataKey::DisputeRecord(dispute_id), &dispute);
+    }
+
+    /// Returns the full record for a dispute. Panics with `DisputeNotFound`
+    /// if `dispute_id` is unknown.
+    pub fn get_dispute(env: Env, dispute_id: u64) -> Dispute {
+        env.storage()
+            .instance()
+            .get(&DataKey::DisputeRecord(dispute_id))
+            .unwrap_or_else(|| panic_with_error!(&env, VerifierError::DisputeNotFound))
+    }
+
+    /// Returns every dispute id ever filed against a credential, oldest
+    /// first. Not privacy-gated: dispute ids reveal that a challenge was
+    /// filed, not attestation or invalidation detail.
+    pub fn get_credential_disputes(env: Env, credential_id: u64) -> Vec<u64> {
+        env.storage()
+            .instance()
+            .get(&DataKey::CredentialDisputeHistory(credential_id))
+            .unwrap_or_else(|| Vec::new(&env))
+    }
+
+    /// Sets the number of concurring oracle votes needed to resolve a
+    /// dispute. Admin only. Panics with `InvalidThreshold` if `threshold`
+    /// is zero.
+    pub fn set_dispute_threshold(env: Env, threshold: u32) {
+        Self::require_admin(&env);
+        if threshold == 0 {
+            panic_with_error!(&env, VerifierError::InvalidThreshold);
+        }
+        env.storage()
+            .instance()
+            .set(&DataKey::DisputeThreshold, &threshold);
+    }
+
+    /// Returns the number of concurring oracle votes needed to resolve a
+    /// dispute. Falls back to `DEFAULT_DISPUTE_THRESHOLD` if never
+    /// configured.
+    pub fn dispute_threshold(env: Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::DisputeThreshold)
+            .unwrap_or(DEFAULT_DISPUTE_THRESHOLD)
+    }
+
     /// Returns the latest version number recorded for a credential (0 if it
     /// has never been attested), regardless of whether earlier versions
     /// have since been pruned. Not privacy-gated: a bare count exposes no
@@ -1155,38 +1388,15 @@ impl ZkVerifierContract {
         Address::from_string(&String::from_str(env, MASKED_ORACLE_STRKEY))
     }
 
-    /// Returns a copy of `snapshot` with its `oracle` field masked out, the
-    /// [`CredentialSnapshot`] analog of [`Self::redact_attestation_record`]
-    /// — same trigger (an unauthorized caller at `PrivacyLevel::Confidential`),
-    /// same masked value, same on-chain audit trail via
-    /// `DataKey::AttestationMasking`.
-    fn redact_credential_snapshot(env: &Env, snapshot: &CredentialSnapshot) -> CredentialSnapshot {
-        let field_mask = 1u32 << ATTESTATION_RECORD_FIELD_ORACLE;
-        env.storage().instance().set(
-            &DataKey::AttestationMasking(snapshot.credential_id),
-            &MaskingConfig {
-                masked_fields: env
-                    .crypto()
-                    .sha256(&Bytes::from_array(env, &field_mask.to_le_bytes()))
-                    .into(),
-                version: 1,
-            },
-        );
-        CredentialSnapshot {
-            credential_id: snapshot.credential_id,
-            oracle: Self::masked_oracle(env),
-            invalidated: snapshot.invalidated,
-            timestamp: snapshot.timestamp,
-            version: snapshot.version,
-        }
-    }
-
-    /// Applies the same [`PrivacyLevel`] access check [`Self::get_attestation`]
-    /// uses, to a [`CredentialSnapshot`] instead of an [`AttestationRecord`]:
-    /// `Public` passes it through, `Internal` requires the admin or a
-    /// registered oracle (else panics `AccessDenied`), and `Confidential`
-    /// returns a redacted copy (via [`Self::redact_credential_snapshot`])
-    /// unless the caller is the admin.
+    /// Applies the [`PrivacyLevel`] access check for temporal/version
+    /// queries (`get_credential_at_time`, `get_credential_version`,
+    /// `diff_credential_versions`): `Public` passes the snapshot through,
+    /// `Internal` requires the admin or a registered oracle, and
+    /// `Confidential` requires the admin outright — unlike
+    /// [`Self::get_attestation`], which redacts rather than denies at
+    /// `Confidential`, these methods deny non-admins entirely. A
+    /// credential's full state history is treated as more sensitive than
+    /// its single current attestation record.
     fn gate_snapshot_for_privacy(
         env: &Env,
         requester: &Address,
@@ -1206,7 +1416,7 @@ impl ZkVerifierContract {
                 if Self::is_admin(env, requester) {
                     snapshot
                 } else {
-                    Self::redact_credential_snapshot(env, &snapshot)
+                    panic_with_error!(env, VerifierError::AccessDenied);
                 }
             }
         }
@@ -1343,6 +1553,26 @@ impl ZkVerifierContract {
             .get::<DataKey, Vec<u32>>(&DataKey::CredentialSnapshotVersions(credential_id))
             .unwrap_or_else(|| Vec::new(env));
 
+        // A second state change at the same ledger timestamp (e.g. a
+        // dispute filed and resolved without any ledger-time advance)
+        // overwrites the snapshot already recorded there instead of
+        // minting a new version — see docs/zk-verifier.md, "Credential
+        // Temporal Queries & Retention Policy".
+        if timestamps.last() == Some(timestamp) {
+            let version = versions.last().unwrap_or(1);
+            env.storage().instance().set(
+                &DataKey::CredentialSnapshot(credential_id, timestamp),
+                &CredentialSnapshot {
+                    credential_id,
+                    oracle,
+                    invalidated,
+                    timestamp,
+                    version,
+                },
+            );
+            return;
+        }
+
         let version = versions.last().unwrap_or(0) + 1;
 
         env.storage().instance().set(
@@ -1452,10 +1682,13 @@ impl ZkVerifierContract {
             .instance()
             .get::<DataKey, AttestationRecord>(&DataKey::Attestation(proof_hash, claim_hash))
             .is_some_and(|record| {
-                env.storage()
+                let oracle_registered = env
+                    .storage()
                     .instance()
                     .get::<DataKey, bool>(&DataKey::Oracle(record.oracle))
-                    .unwrap_or(false)
+                    .unwrap_or(false);
+                oracle_registered
+                    && !Self::is_credential_invalidated(env.clone(), record.credential_id)
             })
     }
 
@@ -1538,9 +1771,11 @@ impl ZkVerifierContract {
         else {
             return false;
         };
-        let Some(record) = env.storage().instance().get::<DataKey, AttestationRecord>(
-            &DataKey::Attestation(proof_hash, claim_hash),
-        ) else {
+        let Some(record) = env
+            .storage()
+            .instance()
+            .get::<DataKey, AttestationRecord>(&DataKey::Attestation(proof_hash, claim_hash))
+        else {
             return false;
         };
 

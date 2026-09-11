@@ -661,6 +661,9 @@ fn test_get_credential_at_time_same_timestamp_overwrites_snapshot() {
 #[test]
 fn test_credential_snapshot_retention_prunes_oldest() {
     let (env, _, client) = setup();
+    // See test_credential_version_retention_prunes_oldest_without_renumbering:
+    // this also issues MAX_CREDENTIAL_SNAPSHOTS+1 real contract invocations.
+    env.budget().reset_unlimited();
     let oracle = Address::generate(&env);
     client.register_oracle(&oracle);
     let proof = bytes!(&env, 0xdeadbeef);
@@ -906,6 +909,11 @@ fn test_get_credential_version_same_timestamp_reuses_version() {
 #[test]
 fn test_credential_version_retention_prunes_oldest_without_renumbering() {
     let (env, _, client) = setup();
+    // This test intentionally issues MAX_CREDENTIAL_SNAPSHOTS+1 real
+    // contract invocations to exercise retention pruning, which exceeds the
+    // default test CPU/memory budget; that budget exists to catch runaway
+    // contract logic, not to cap a deliberately large test loop.
+    env.budget().reset_unlimited();
     let oracle = Address::generate(&env);
     client.register_oracle(&oracle);
     let proof = bytes!(&env, 0xdeadbeef);
