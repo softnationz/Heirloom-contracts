@@ -179,4 +179,3 @@ fn fetch_ttl_remaining(_vault_id: u64) -> u32 {
 fn send_reminder(vault_id: u64, channel: &crate::models::Channel, hours_left: u32) {
     tracing::info!(vault_id, ?channel, hours_left, "sending reminder");
 }
-
