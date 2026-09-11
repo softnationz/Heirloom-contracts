@@ -271,8 +271,18 @@ mod tests {
         assert!(cfg.enabled);
     }
 
+    /// `DecompressionConfig::from_env` reads process-wide env vars, and
+    /// `cargo test` runs tests in parallel by default, so tests that mutate
+    /// `DECOMP_*` vars must serialize against each other or they race.
+    static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    fn lock_env() -> std::sync::MutexGuard<'static, ()> {
+        ENV_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
     #[test]
     fn test_config_from_env() {
+        let _guard = lock_env();
         std::env::set_var("DECOMP_MAX_BODY_BYTES", "2048");
         std::env::set_var("DECOMP_ENABLED", "true");
         let cfg = DecompressionConfig::from_env();
@@ -284,6 +294,7 @@ mod tests {
 
     #[test]
     fn test_config_disabled_via_env() {
+        let _guard = lock_env();
         std::env::set_var("DECOMP_ENABLED", "false");
         let cfg = DecompressionConfig::from_env();
         assert!(!cfg.enabled);
