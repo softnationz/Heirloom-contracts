@@ -431,7 +431,7 @@ impl SbtContract {
         // Validate fractions sum to 10000 basis points
         let mut total: u64 = 0;
         for fraction in fractions.iter() {
-            total = total.saturating_add(*fraction);
+            total = total.saturating_add(fraction);
         }
         if total != 10000 {
             panic_with_error!(&env, SbtError::InvalidFractionSum);
@@ -453,7 +453,7 @@ impl SbtContract {
             let history_entry = OwnershipHistoryEntry {
                 sbt_id,
                 holder: holder.clone(),
-                fraction: *fraction,
+                fraction,
                 action: OwnershipAction::Created,
                 at: env.ledger().timestamp(),
             };
@@ -664,7 +664,7 @@ impl SbtContract {
             panic_with_error!(&env, SbtError::InvalidCompositionGraph);
         }
         for component_id in component_ids.iter() {
-            Self::load_owner(&env, *component_id);
+            Self::load_owner(&env, component_id);
         }
         env.storage().instance().set(
             &DataKey::CompositionComponents(sbt_id),
@@ -907,7 +907,7 @@ impl SbtContract {
         Self::load_owner(&env, sbt_id);
 
         // A fractionally-owned SBT has no single holder to reassign.
-        if Self::is_fractional(&env, sbt_id) {
+        if Self::is_fractional(env.clone(), sbt_id) {
             panic_with_error!(&env, SbtError::FractionalOwnershipExists);
         }
 
@@ -1010,7 +1010,7 @@ impl SbtContract {
         let mut visited = Map::new(env);
         let mut pending = Vec::new(env);
         for root in roots.iter() {
-            pending.push_back(*root);
+            pending.push_back(root);
         }
         let mut steps = 0u32;
         while let Some(current) = pending.pop_back() {
@@ -1029,7 +1029,7 @@ impl SbtContract {
                 &DataKey::CompositionComponents(current),
             ) {
                 for component in components.component_ids.iter() {
-                    pending.push_back(*component);
+                    pending.push_back(component);
                 }
             }
         }
@@ -1051,9 +1051,9 @@ impl SbtContract {
             &DataKey::CompositionComponents(current),
         ) {
             for component in components.component_ids.iter() {
-                Self::load_owner(env, *component);
-                resolved.push_back(*component);
-                Self::resolve_composition_inner(env, *component, depth + 1, visited, resolved);
+                Self::load_owner(env, component);
+                resolved.push_back(component);
+                Self::resolve_composition_inner(env, component, depth + 1, visited, resolved);
             }
         }
     }

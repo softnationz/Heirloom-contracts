@@ -1,7 +1,11 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{bytes, testutils::Address as _, vec};
+use soroban_sdk::{
+    bytes,
+    testutils::{Address as _, Ledger as _},
+    vec,
+};
 
 fn setup() -> (Env, Address, Address) {
     let env = Env::default();
@@ -88,7 +92,9 @@ fn redeeming_without_generated_codes_panics_no_recovery_codes() {
         .unwrap_err();
     assert_eq!(
         err,
-        soroban_sdk::Error::from_contract_error(SbtError::NoRecoveryCodes as u32)
+        Ok(soroban_sdk::Error::from_contract_error(
+            SbtError::NoRecoveryCodes as u32
+        ))
     );
 }
 
@@ -130,7 +136,9 @@ fn recovery_is_blocked_for_fractionally_owned_sbt() {
         .unwrap_err();
     assert_eq!(
         err,
-        soroban_sdk::Error::from_contract_error(SbtError::FractionalOwnershipExists as u32)
+        Ok(soroban_sdk::Error::from_contract_error(
+            SbtError::FractionalOwnershipExists as u32
+        ))
     );
 }
 
@@ -189,7 +197,9 @@ fn rate_limit_bounds_attempts_per_window() {
         .unwrap_err();
     assert_eq!(
         err,
-        soroban_sdk::Error::from_contract_error(SbtError::RecoveryRateLimited as u32)
+        Ok(soroban_sdk::Error::from_contract_error(
+            SbtError::RecoveryRateLimited as u32
+        ))
     );
     assert_eq!(client.owner_of(&sbt_id), owner);
 }
