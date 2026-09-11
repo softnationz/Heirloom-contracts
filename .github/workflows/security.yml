@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        workspace: [contracts, backend]
+        workspace: [Heirloom-contracts, Heirloom-backend]
     defaults:
       run:
         working-directory: ${{ matrix.workspace }}
