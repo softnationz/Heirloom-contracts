@@ -37,7 +37,7 @@ fi
 
 ./scripts/build.sh
 
-WASM="contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm"
+WASM="Heirloom-contracts/target/wasm32-unknown-unknown/release/ttl_vault.wasm"
 
 echo "Deploying contract to $NETWORK..."
 CONTRACT_ID=$(stellar contract deploy \
