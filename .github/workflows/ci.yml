@@ -43,6 +43,12 @@ jobs:
       - name: Run tests
         run: cargo test --package ttl-vault
 
+      - name: Build sbt crate
+        run: cargo build --package sbt --lib
+
+      - name: Run sbt tests
+        run: cargo test --package sbt
+
       - name: Check formatting
         run: cargo fmt --all -- --check
 
