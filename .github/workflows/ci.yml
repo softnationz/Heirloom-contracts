@@ -22,7 +22,7 @@ jobs:
       # Pinned (not @stable): newer rustc releases reject an unsound transmute
       # in ethnum 1.5.2 (a transitive Soroban SDK dependency) with E0512, which
       # broke every CI run once rustc moved past 1.96.x. Bump deliberately.
-      - uses: dtolnay/rust-toolchain@1.96.1
+      - uses: dtolnay/rust-toolchain@1.120.0
         with:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@1.96.1
+      - uses: dtolnay/rust-toolchain@1.120.0
         with:
           components: clippy, rustfmt
 
