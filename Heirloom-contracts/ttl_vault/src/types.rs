@@ -225,6 +225,28 @@ pub const TOKEN_HEDGE_CLOSE_TOPIC: Symbol = symbol_short!("tok_hcls");
 pub const TOKEN_REBALANCE_TOPIC: Symbol = symbol_short!("tok_rebl");
 pub const TOKEN_REBALANCED_TOPIC: Symbol = symbol_short!("tok_rebd");
 
+// Issue #526: beneficiary post-release clawback
+pub const FUNDS_CLAWEDBACK_TOPIC: Symbol = symbol_short!("clawback");
+pub const BEN_RELEASED_TOPIC: Symbol = symbol_short!("ben_rls");
+/// 7-day grace window (in seconds) after a beneficiary release during which the owner may clawback.
+pub const GRACE_PERIOD_SECONDS: u64 = 7 * 24 * 60 * 60;
+
+// Issue #528: beneficiary allocation swap
+pub const BEN_SWAPPED_TOPIC: Symbol = symbol_short!("ben_swap");
+
+// Issue #524: configurable BPS rounding mode
+pub const ROUNDING_MODE_TOPIC: Symbol = symbol_short!("rnd_mode");
+
+/// Rounding strategy applied at distribution time to prevent sub-stroop dust - Issue #524.
+/// BPS storage is never mutated; rounding is applied only when computing share amounts.
+#[contracttype]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum RoundingMode {
+    Floor = 0,
+    Ceil = 1,
+    Round = 2,
+}
+
 // Issue #529: beneficiary pooling
 pub const POOL_CREATED_TOPIC: Symbol = symbol_short!("pool_crt");
 
@@ -462,6 +484,10 @@ pub enum DataKey {
     TokenHedge(u64),
     // Issue #588: token rebalancing
     TokenRebalance(u64),
+    // Issue #524: vault-level rounding mode
+    VaultRoundingMode(u64),
+    // Issue #526: beneficiary post-release clawback (vault_id, beneficiary_address) => release timestamp
+    ClawbackReleaseTs(u64, Address),
     // Issue #529: beneficiary pooling
     BeneficiaryPool(u64),
     BeneficiaryPoolAlloc(u64),

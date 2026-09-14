@@ -3,18 +3,9 @@
 extern crate alloc;
 
 use super::*;
-use soroban_sdk::{
-    testutils::Address as _,
-    token::StellarAssetClient,
-    Address, Env,
-};
+use soroban_sdk::{testutils::Address as _, token::StellarAssetClient, Address, Env};
 
-fn setup_rounding_env() -> (
-    Env,
-    Address,
-    Address,
-    TtlVaultContractClient<'static>,
-) {
+fn setup_rounding_env() -> (Env, Address, Address, TtlVaultContractClient<'static>) {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -40,7 +31,7 @@ fn setup_rounding_env() -> (
 fn test_default_rounding_mode_is_floor() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     // No mode set — should default to Floor (0)
     let mode = client.get_rounding_mode(&vault_id);
@@ -52,7 +43,7 @@ fn test_default_rounding_mode_is_floor() {
 fn test_set_rounding_mode_ceil() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     client.set_rounding_mode(&vault_id, &owner, &RoundingMode::Ceil);
     let mode = client.get_rounding_mode(&vault_id);
@@ -64,7 +55,7 @@ fn test_set_rounding_mode_ceil() {
 fn test_apply_rounding_floor() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     client.set_rounding_mode(&vault_id, &owner, &RoundingMode::Floor);
     // 10 / 3 = 3 (floor)
@@ -77,7 +68,7 @@ fn test_apply_rounding_floor() {
 fn test_apply_rounding_ceil() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     client.set_rounding_mode(&vault_id, &owner, &RoundingMode::Ceil);
     // 10 / 3 = 4 (ceil)
@@ -90,7 +81,7 @@ fn test_apply_rounding_ceil() {
 fn test_apply_rounding_round() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     client.set_rounding_mode(&vault_id, &owner, &RoundingMode::Round);
     // 7 / 2 = 4 (round: (7 + 1) / 2 = 4)
@@ -107,12 +98,20 @@ fn test_rounding_mode_does_not_alter_bps_storage() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
     let b2 = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let entries = soroban_sdk::vec![
         &env,
-        BeneficiaryEntry { address: b1.clone(), bps: 3333, minimum_threshold: 0 },
-        BeneficiaryEntry { address: b2.clone(), bps: 6667, minimum_threshold: 0 },
+        BeneficiaryEntry {
+            address: b1.clone(),
+            bps: 3333,
+            minimum_threshold: 0
+        },
+        BeneficiaryEntry {
+            address: b2.clone(),
+            bps: 6667,
+            minimum_threshold: 0
+        },
     ];
     client.set_beneficiaries(&vault_id, &owner, &entries);
 
@@ -121,7 +120,10 @@ fn test_rounding_mode_does_not_alter_bps_storage() {
     // BPS values must be unchanged
     let vault = client.get_vault(&vault_id);
     let total: u32 = vault.beneficiaries.iter().map(|e| e.bps).sum();
-    assert_eq!(total, 10_000u32, "total BPS must remain 10 000 regardless of rounding mode");
+    assert_eq!(
+        total, 10_000u32,
+        "total BPS must remain 10 000 regardless of rounding mode"
+    );
 }
 
 /// Only the vault owner can change the rounding mode.
@@ -130,7 +132,7 @@ fn test_set_rounding_mode_rejects_non_owner() {
     let (env, owner, _, client) = setup_rounding_env();
     let b1 = Address::generate(&env);
     let impostor = Address::generate(&env);
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let result = client.try_set_rounding_mode(&vault_id, &impostor, &RoundingMode::Ceil);
     assert!(result.is_err());

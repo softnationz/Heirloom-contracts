@@ -3,18 +3,9 @@
 extern crate alloc;
 
 use super::*;
-use soroban_sdk::{
-    testutils::Address as _,
-    token::StellarAssetClient,
-    vec, Address, Env,
-};
+use soroban_sdk::{testutils::Address as _, token::StellarAssetClient, vec, Address, Env};
 
-fn setup_swap_env() -> (
-    Env,
-    Address,
-    Address,
-    TtlVaultContractClient<'static>,
-) {
+fn setup_swap_env() -> (Env, Address, Address, TtlVaultContractClient<'static>) {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -43,20 +34,38 @@ fn test_swap_allocations_success() {
     let b1 = Address::generate(&env);
     let b2 = Address::generate(&env);
 
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let entries = vec![
         &env,
-        BeneficiaryEntry { address: b1.clone(), bps: 7000, minimum_threshold: 0 },
-        BeneficiaryEntry { address: b2.clone(), bps: 3000, minimum_threshold: 0 },
+        BeneficiaryEntry {
+            address: b1.clone(),
+            bps: 7000,
+            minimum_threshold: 0,
+        },
+        BeneficiaryEntry {
+            address: b2.clone(),
+            bps: 3000,
+            minimum_threshold: 0,
+        },
     ];
     client.set_beneficiaries(&vault_id, &owner, &entries);
 
     client.swap_allocations(&vault_id, &owner, &b1, &b2);
 
     let vault = client.get_vault(&vault_id);
-    let bps_b1 = vault.beneficiaries.iter().find(|e| e.address == b1).unwrap().bps;
-    let bps_b2 = vault.beneficiaries.iter().find(|e| e.address == b2).unwrap().bps;
+    let bps_b1 = vault
+        .beneficiaries
+        .iter()
+        .find(|e| e.address == b1)
+        .unwrap()
+        .bps;
+    let bps_b2 = vault
+        .beneficiaries
+        .iter()
+        .find(|e| e.address == b2)
+        .unwrap()
+        .bps;
     assert_eq!(bps_b1, 3000, "b1 should now have b2's old BPS");
     assert_eq!(bps_b2, 7000, "b2 should now have b1's old BPS");
 }
@@ -69,12 +78,20 @@ fn test_swap_allocations_idempotent_double_swap() {
     let b1 = Address::generate(&env);
     let b2 = Address::generate(&env);
 
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let entries = vec![
         &env,
-        BeneficiaryEntry { address: b1.clone(), bps: 6000, minimum_threshold: 0 },
-        BeneficiaryEntry { address: b2.clone(), bps: 4000, minimum_threshold: 0 },
+        BeneficiaryEntry {
+            address: b1.clone(),
+            bps: 6000,
+            minimum_threshold: 0,
+        },
+        BeneficiaryEntry {
+            address: b2.clone(),
+            bps: 4000,
+            minimum_threshold: 0,
+        },
     ];
     client.set_beneficiaries(&vault_id, &owner, &entries);
 
@@ -82,8 +99,18 @@ fn test_swap_allocations_idempotent_double_swap() {
     client.swap_allocations(&vault_id, &owner, &b1, &b2);
 
     let vault = client.get_vault(&vault_id);
-    let bps_b1 = vault.beneficiaries.iter().find(|e| e.address == b1).unwrap().bps;
-    let bps_b2 = vault.beneficiaries.iter().find(|e| e.address == b2).unwrap().bps;
+    let bps_b1 = vault
+        .beneficiaries
+        .iter()
+        .find(|e| e.address == b1)
+        .unwrap()
+        .bps;
+    let bps_b2 = vault
+        .beneficiaries
+        .iter()
+        .find(|e| e.address == b2)
+        .unwrap()
+        .bps;
     assert_eq!(bps_b1, 6000);
     assert_eq!(bps_b2, 4000);
 }
@@ -96,11 +123,15 @@ fn test_swap_allocations_rejects_unknown_address() {
     let b1 = Address::generate(&env);
     let stranger = Address::generate(&env);
 
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let entries = vec![
         &env,
-        BeneficiaryEntry { address: b1.clone(), bps: 10_000, minimum_threshold: 0 },
+        BeneficiaryEntry {
+            address: b1.clone(),
+            bps: 10_000,
+            minimum_threshold: 0,
+        },
     ];
     client.set_beneficiaries(&vault_id, &owner, &entries);
 
@@ -117,12 +148,20 @@ fn test_swap_allocations_rejects_non_owner() {
     let b2 = Address::generate(&env);
     let impostor = Address::generate(&env);
 
-    let vault_id = client.create_vault(&owner, &b1, &100);
+    let vault_id = client.create_vault(&owner, &b1, &100, &None);
 
     let entries = vec![
         &env,
-        BeneficiaryEntry { address: b1.clone(), bps: 5000, minimum_threshold: 0 },
-        BeneficiaryEntry { address: b2.clone(), bps: 5000, minimum_threshold: 0 },
+        BeneficiaryEntry {
+            address: b1.clone(),
+            bps: 5000,
+            minimum_threshold: 0,
+        },
+        BeneficiaryEntry {
+            address: b2.clone(),
+            bps: 5000,
+            minimum_threshold: 0,
+        },
     ];
     client.set_beneficiaries(&vault_id, &owner, &entries);
 

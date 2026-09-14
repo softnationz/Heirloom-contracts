@@ -34,7 +34,7 @@ use types::{
     MilestoneVestingSchedule, MultiSigConfig, MultiSigOperation, MultiSigProposal, OwnershipProof,
     OwnershipTransferRequest, PasskeyAuditEntry, PasskeyDelegation, PasskeyEscrowRecord,
     PasskeyHash, PasskeyUsageEntry, PauseRecord, PendingBeneficiaryUpdate, ProofOfLifeEntry,
-    ProposalStatus, ReleaseCondition, ReleaseEvent, ReleaseStatus, ReleaseVoteEntry,
+    ProposalStatus, ReleaseCondition, ReleaseEvent, ReleaseStatus, ReleaseVoteEntry, RoundingMode,
     StateTransitionEntry, TokenCollateral, TokenConversion, TokenHedge, TokenLending,
     TokenRebalanceConfig, TokenStaking, TokenWeight, TtlBorrowRecord, Vault, VaultStatusSummary,
     VestingBonusConfig, VestingCatchUpConfig, VestingPenaltyConfig, VestingPendingClaim,
@@ -45,19 +45,20 @@ use types::{
     BATCH_CHECKIN_TOPIC, BATCH_STATUS_TOPIC, BENEFICIARY_ACCEPTED_TOPIC, BENEFICIARY_CAP_TOPIC,
     BENEFICIARY_CONDITION_ACCEPTED_TOPIC, BENEFICIARY_DECLINED_TOPIC, BENEFICIARY_REBALANCED_TOPIC,
     BENEFICIARY_TIER_SET_TOPIC, BENEFICIARY_TRIGGER_SET_TOPIC, BENEFICIARY_UPDATED_TOPIC,
-    BENEFICIARY_WATERFALL_TOPIC, BEN_ROTATION_TOPIC, CANCEL_TOPIC, CHECKIN_GEO_TOPIC,
-    CHECKIN_POW_TOPIC, CHECKIN_RATE_LIMITED_TOPIC, CHECK_IN_TOPIC, CLAIM_VEST_TOPIC,
-    CLIFF_REACHED_TOPIC, CONDITIONS_ACCEPTED_TOPIC, CONFLICT_EXPIRED_TOPIC,
+    BENEFICIARY_WATERFALL_TOPIC, BEN_RELEASED_TOPIC, BEN_ROTATION_TOPIC, BEN_SWAPPED_TOPIC,
+    CANCEL_TOPIC, CHECKIN_GEO_TOPIC, CHECKIN_POW_TOPIC, CHECKIN_RATE_LIMITED_TOPIC, CHECK_IN_TOPIC,
+    CLAIM_VEST_TOPIC, CLIFF_REACHED_TOPIC, CONDITIONS_ACCEPTED_TOPIC, CONFLICT_EXPIRED_TOPIC,
     DELEGATE_BENEFICIARY_TOPIC, DELEGATE_CHECKIN_TOPIC, DEPOSIT_TOPIC, DISPUTE_FILED_TOPIC,
     DISPUTE_RESOLVED_TOPIC, DUPLICATE_VAULT_TOPIC, EXPIRY_WARNING_THRESHOLD,
-    HIBERNATION_ENTERED_TOPIC, HIBERNATION_EXITED_TOPIC, INACTIVITY_PENALTY_TOPIC,
-    INHERITANCE_TOPIC, INTEGRITY_TOPIC, MAX_CUSTOM_METADATA_LEN, MAX_DESCRIPTION_LEN,
-    MAX_METADATA_LEN, MAX_NAME_LEN, MAX_NOTES_LEN, META_REVERT_TOPIC, META_VERSION_TOPIC,
-    MIN_THRESHOLD_REDISTRIBUTE_TOPIC, MIN_THRESHOLD_SET_TOPIC, MIN_THRESHOLD_SKIP_TOPIC,
-    MULTISIG_APPROVED_TOPIC, MULTISIG_CONFIG_TOPIC, MULTISIG_EXECUTED_TOPIC,
-    MULTISIG_PROPOSAL_EXPIRY, MULTISIG_PROPOSED_TOPIC, MULTISIG_REJECTED_TOPIC,
-    MULTISIG_SIGNER_REMOVED_TOPIC, MULTISIG_VETOED_TOPIC, OWNERSHIP_ACCEPTED_TOPIC,
-    OWNERSHIP_CANCELLED_TOPIC, OWNERSHIP_INITIATED_TOPIC, OWNERSHIP_PROOF_TOPIC, OWNERSHIP_TOPIC,
+    FUNDS_CLAWEDBACK_TOPIC, GRACE_PERIOD_SECONDS, HIBERNATION_ENTERED_TOPIC,
+    HIBERNATION_EXITED_TOPIC, INACTIVITY_PENALTY_TOPIC, INHERITANCE_TOPIC, INTEGRITY_TOPIC,
+    MAX_CUSTOM_METADATA_LEN, MAX_DESCRIPTION_LEN, MAX_METADATA_LEN, MAX_NAME_LEN, MAX_NOTES_LEN,
+    META_REVERT_TOPIC, META_VERSION_TOPIC, MIN_THRESHOLD_REDISTRIBUTE_TOPIC,
+    MIN_THRESHOLD_SET_TOPIC, MIN_THRESHOLD_SKIP_TOPIC, MULTISIG_APPROVED_TOPIC,
+    MULTISIG_CONFIG_TOPIC, MULTISIG_EXECUTED_TOPIC, MULTISIG_PROPOSAL_EXPIRY,
+    MULTISIG_PROPOSED_TOPIC, MULTISIG_REJECTED_TOPIC, MULTISIG_SIGNER_REMOVED_TOPIC,
+    MULTISIG_VETOED_TOPIC, OWNERSHIP_ACCEPTED_TOPIC, OWNERSHIP_CANCELLED_TOPIC,
+    OWNERSHIP_INITIATED_TOPIC, OWNERSHIP_PROOF_TOPIC, OWNERSHIP_TOPIC,
     OWNERSHIP_TRANSFER_EXPIRED_TOPIC, PARTIAL_LIQUIDATE_TOPIC, PASSKEY_AUDIT_TOPIC,
     PASSKEY_DELEGATED_TOPIC, PASSKEY_DELEGATION_REVOKED_TOPIC, PASSKEY_ESCROWED_TOPIC,
     PASSKEY_ESCROW_CANCELLED_TOPIC, PASSKEY_ESCROW_RELEASED_TOPIC, PASSKEY_EXPIRY_EXTENDED_TOPIC,
@@ -67,14 +68,14 @@ use types::{
     PAUSE_VAULT_TOPIC, PING_EXPIRY_TOPIC, POOL_CREATED_TOPIC, PROOF_OF_LIFE_TOPIC,
     RECOVERY_EXTEND_TOPIC, RELEASE_TOPIC, RELEASE_VOTE_PASSED_TOPIC, RELEASE_VOTE_TOPIC,
     REMOVE_PASSKEY_TOPIC, RESTORE_VAULT_TOPIC, RESUME_VAULT_TOPIC, REVOKE_DELEGATE_TOPIC,
-    ROTATE_PASSKEY_TOPIC, SET_BENEFICIARIES_TOPIC, SET_BURN_PERCENTAGE_TOPIC, SET_DECAY_RATE_TOPIC,
-    SET_MAX_INTERVAL_TOPIC, SET_MAX_TTL_TOPIC, SET_METADATA_TOPIC, SET_MIN_INTERVAL_TOPIC,
-    SET_RECOVERY_TOPIC, SET_SPENDING_LIMIT_TOPIC, SET_VESTING_TOPIC, STATE_TRANSITION_TOPIC,
-    SYNC_TTL_TOPIC, TOKEN_COLLATERAL_TOPIC, TOKEN_COLLAT_RLSD_TOPIC, TOKEN_CONVERSION_TOPIC,
-    TOKEN_HEDGE_CLOSE_TOPIC, TOKEN_HEDGE_TOPIC, TOKEN_LENDING_TOPIC, TOKEN_LEND_REPAY_TOPIC,
-    TOKEN_REBALANCED_TOPIC, TOKEN_REBALANCE_TOPIC, TOKEN_STAKING_TOPIC, TOKEN_UNSTAKING_TOPIC,
-    TOKEN_WHITELIST_VALIDATED_TOPIC, TTL_ACCELERATE_TOPIC, TTL_BORROW_TOPIC, TTL_DECAY_TOPIC,
-    TTL_PREDICTED_TOPIC, TTL_REPAY_TOPIC, UNPAUSE_TOPIC, UPDATE_INTERVAL_TOPIC,
+    ROTATE_PASSKEY_TOPIC, ROUNDING_MODE_TOPIC, SET_BENEFICIARIES_TOPIC, SET_BURN_PERCENTAGE_TOPIC,
+    SET_DECAY_RATE_TOPIC, SET_MAX_INTERVAL_TOPIC, SET_MAX_TTL_TOPIC, SET_METADATA_TOPIC,
+    SET_MIN_INTERVAL_TOPIC, SET_RECOVERY_TOPIC, SET_SPENDING_LIMIT_TOPIC, SET_VESTING_TOPIC,
+    STATE_TRANSITION_TOPIC, SYNC_TTL_TOPIC, TOKEN_COLLATERAL_TOPIC, TOKEN_COLLAT_RLSD_TOPIC,
+    TOKEN_CONVERSION_TOPIC, TOKEN_HEDGE_CLOSE_TOPIC, TOKEN_HEDGE_TOPIC, TOKEN_LENDING_TOPIC,
+    TOKEN_LEND_REPAY_TOPIC, TOKEN_REBALANCED_TOPIC, TOKEN_REBALANCE_TOPIC, TOKEN_STAKING_TOPIC,
+    TOKEN_UNSTAKING_TOPIC, TOKEN_WHITELIST_VALIDATED_TOPIC, TTL_ACCELERATE_TOPIC, TTL_BORROW_TOPIC,
+    TTL_DECAY_TOPIC, TTL_PREDICTED_TOPIC, TTL_REPAY_TOPIC, UNPAUSE_TOPIC, UPDATE_INTERVAL_TOPIC,
     UPDATE_METADATA_TOPIC, VAULT_ARCHIVED_TOPIC, VAULT_CAP_TOPIC, VAULT_CLONED_OVERRIDE_TOPIC,
     VAULT_CLONED_TOPIC, VAULT_CREATED_TOPIC, VAULT_MERGED_TOPIC, VESTING_BONUS_CLAIMED_TOPIC,
     VESTING_BONUS_SET_TOPIC, VESTING_CANCELLED_TOPIC, VESTING_CATCHUP_CLAIMED_TOPIC,
@@ -113,7 +114,13 @@ use types::{
 #[cfg(test)]
 mod beneficiary_auction_tests;
 #[cfg(test)]
+mod beneficiary_clawback_tests;
+#[cfg(test)]
 mod beneficiary_pooling_tests;
+#[cfg(test)]
+mod beneficiary_rounding_tests;
+#[cfg(test)]
+mod beneficiary_swap_tests;
 #[cfg(test)]
 mod beneficiary_vesting_auction_tests;
 #[cfg(test)]
@@ -14407,6 +14414,237 @@ impl TtlVaultContract {
         env.storage()
             .persistent()
             .get(&DataKey::TokenRebalance(vault_id))
+    }
+
+    // ── Issue #524: configurable BPS rounding rules ───────────────────────
+
+    /// Sets the rounding mode used when computing per-beneficiary share amounts - Issue #524.
+    ///
+    /// Rounding is applied **only at distribution time**; BPS storage is never mutated,
+    /// so there is zero migration risk and total BPS remains 10 000.
+    ///
+    /// | Mode  | Formula                                  |
+    /// |-------|------------------------------------------|
+    /// | Floor | `value / divisor`  (default)             |
+    /// | Ceil  | `(value + divisor - 1) / divisor`        |
+    /// | Round | `(value + divisor / 2) / divisor`        |
+    ///
+    /// # Errors
+    /// * `ContractError::NotOwner` - caller is not the vault owner
+    pub fn set_rounding_mode(
+        env: Env,
+        vault_id: u64,
+        caller: Address,
+        mode: RoundingMode,
+    ) -> Result<(), ContractError> {
+        caller.require_auth();
+        Self::assert_not_paused(&env);
+        let vault = Self::load_vault(&env, vault_id);
+        if caller != vault.owner {
+            return Err(ContractError::NotOwner);
+        }
+        let key = DataKey::VaultRoundingMode(vault_id);
+        env.storage().persistent().set(&key, &mode);
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, VAULT_TTL_THRESHOLD, VAULT_TTL_LEDGERS);
+        env.storage()
+            .instance()
+            .extend_ttl(INSTANCE_TTL_THRESHOLD, INSTANCE_TTL_LEDGERS);
+        env.events()
+            .publish((ROUNDING_MODE_TOPIC, vault_id), mode as u32);
+        Ok(())
+    }
+
+    /// Returns the active rounding mode for `vault_id` (defaults to `RoundingMode::Floor`).
+    pub fn get_rounding_mode(env: Env, vault_id: u64) -> RoundingMode {
+        env.storage()
+            .persistent()
+            .get(&DataKey::VaultRoundingMode(vault_id))
+            .unwrap_or(RoundingMode::Floor)
+    }
+
+    /// Applies the vault's configured rounding mode to `value / divisor`.
+    ///
+    /// This is a **pure computation helper** — call it during any distribution pass to
+    /// avoid sub-stroop dust without altering stored BPS.
+    pub fn apply_rounding(env: Env, vault_id: u64, value: i128, divisor: i128) -> i128 {
+        let mode = Self::get_rounding_mode(env, vault_id);
+        match mode {
+            RoundingMode::Ceil => (value + divisor - 1) / divisor,
+            RoundingMode::Round => (value + divisor / 2) / divisor,
+            RoundingMode::Floor => value / divisor,
+        }
+    }
+
+    // ── Issue #526: post-release clawback ─────────────────────────────────
+
+    /// Records that `beneficiary` has been released from `vault_id` at the current
+    /// ledger timestamp, opening the `GRACE_PERIOD_SECONDS` clawback window.
+    ///
+    /// Must be called by the vault owner immediately after funds are disbursed.
+    ///
+    /// # Errors
+    /// * `ContractError::NotOwner` - caller is not the vault owner
+    pub fn mark_beneficiary_released(
+        env: Env,
+        vault_id: u64,
+        caller: Address,
+        beneficiary: Address,
+    ) -> Result<(), ContractError> {
+        caller.require_auth();
+        Self::assert_not_paused(&env);
+        let vault = Self::load_vault(&env, vault_id);
+        if caller != vault.owner {
+            return Err(ContractError::NotOwner);
+        }
+        let now = env.ledger().timestamp();
+        let key = DataKey::ClawbackReleaseTs(vault_id, beneficiary.clone());
+        env.storage().persistent().set(&key, &now);
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, VAULT_TTL_THRESHOLD, VAULT_TTL_LEDGERS);
+        env.storage()
+            .instance()
+            .extend_ttl(INSTANCE_TTL_THRESHOLD, INSTANCE_TTL_LEDGERS);
+        env.events()
+            .publish((BEN_RELEASED_TOPIC, vault_id), (beneficiary, now));
+        Ok(())
+    }
+
+    /// Reclaims a beneficiary's allocation back to the vault within the post-release
+    /// grace period - Issue #526.
+    ///
+    /// The grace period is `GRACE_PERIOD_SECONDS` (7 days) from the timestamp recorded
+    /// by `mark_beneficiary_released`. After it expires this function returns an error.
+    /// The beneficiary's BPS is zeroed so they receive nothing on any future distribution.
+    ///
+    /// # Arguments
+    /// * `vault_id`     - The vault to operate on
+    /// * `caller`       - Must be the vault owner
+    /// * `beneficiary`  - The beneficiary whose allocation is reclaimed
+    ///
+    /// # Errors
+    /// * `ContractError::NotOwner`         - caller is not the vault owner
+    /// * `ContractError::NotReleased`      - beneficiary was never marked released
+    /// * `ContractError::GracePeriodExpired` - grace window has closed
+    pub fn clawback_post_release(
+        env: Env,
+        vault_id: u64,
+        caller: Address,
+        beneficiary: Address,
+    ) -> Result<u32, ContractError> {
+        caller.require_auth();
+        Self::assert_not_paused(&env);
+        let mut vault = Self::load_vault(&env, vault_id);
+        if caller != vault.owner {
+            return Err(ContractError::NotOwner);
+        }
+
+        let key = DataKey::ClawbackReleaseTs(vault_id, beneficiary.clone());
+        let release_ts: u64 = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .ok_or(ContractError::NotReleased)?;
+
+        let now = env.ledger().timestamp();
+        if now > release_ts + GRACE_PERIOD_SECONDS {
+            return Err(ContractError::GracePeriodExpired);
+        }
+
+        // Zero out the beneficiary's BPS allocation
+        let mut reclaimed_bps: u32 = 0;
+        for i in 0..vault.beneficiaries.len() {
+            let mut entry = vault.beneficiaries.get(i).unwrap();
+            if entry.address == beneficiary {
+                reclaimed_bps = entry.bps;
+                entry.bps = 0;
+                vault.beneficiaries.set(i, entry);
+                break;
+            }
+        }
+
+        // Clear the release record so clawback cannot be called twice
+        env.storage().persistent().remove(&key);
+
+        Self::save_vault(&env, vault_id, &vault);
+        env.storage()
+            .instance()
+            .extend_ttl(INSTANCE_TTL_THRESHOLD, INSTANCE_TTL_LEDGERS);
+        env.events().publish(
+            (FUNDS_CLAWEDBACK_TOPIC, vault_id),
+            (beneficiary, reclaimed_bps),
+        );
+        Ok(reclaimed_bps)
+    }
+
+    /// Returns the release timestamp for `beneficiary` in `vault_id`, if set.
+    pub fn get_release_timestamp(env: Env, vault_id: u64, beneficiary: Address) -> Option<u64> {
+        env.storage()
+            .persistent()
+            .get(&DataKey::ClawbackReleaseTs(vault_id, beneficiary))
+    }
+
+    /// Atomically swaps the BPS allocations of two vault beneficiaries - Issue #528.
+    ///
+    /// Both `a` and `b` must appear in the vault's beneficiary list. The swap is a
+    /// two-assignment mutation inside a single transaction, so it is atomic by EVM/SVM
+    /// transaction semantics and has no reentrancy surface.
+    ///
+    /// # Arguments
+    /// * `vault_id` - The vault whose beneficiary list is mutated
+    /// * `caller`   - Must be the vault owner
+    /// * `a`        - First beneficiary address
+    /// * `b`        - Second beneficiary address
+    ///
+    /// # Errors
+    /// * `ContractError::NotOwner`           - caller is not the vault owner
+    /// * `ContractError::InvalidBeneficiary` - `a` or `b` is not in the beneficiary list
+    pub fn swap_allocations(
+        env: Env,
+        vault_id: u64,
+        caller: Address,
+        a: Address,
+        b: Address,
+    ) -> Result<(), ContractError> {
+        caller.require_auth();
+        Self::assert_not_paused(&env);
+        let mut vault = Self::load_vault(&env, vault_id);
+        if caller != vault.owner {
+            return Err(ContractError::NotOwner);
+        }
+
+        let mut idx_a: Option<u32> = None;
+        let mut idx_b: Option<u32> = None;
+        for (i, entry) in vault.beneficiaries.iter().enumerate() {
+            if entry.address == a {
+                idx_a = Some(i as u32);
+            }
+            if entry.address == b {
+                idx_b = Some(i as u32);
+            }
+        }
+        let ia = idx_a.ok_or(ContractError::InvalidBeneficiary)?;
+        let ib = idx_b.ok_or(ContractError::InvalidBeneficiary)?;
+
+        let bps_a = vault.beneficiaries.get(ia).unwrap().bps;
+        let bps_b = vault.beneficiaries.get(ib).unwrap().bps;
+
+        let mut entry_a = vault.beneficiaries.get(ia).unwrap();
+        let mut entry_b = vault.beneficiaries.get(ib).unwrap();
+        entry_a.bps = bps_b;
+        entry_b.bps = bps_a;
+        vault.beneficiaries.set(ia, entry_a);
+        vault.beneficiaries.set(ib, entry_b);
+
+        Self::save_vault(&env, vault_id, &vault);
+        env.storage()
+            .instance()
+            .extend_ttl(INSTANCE_TTL_THRESHOLD, INSTANCE_TTL_LEDGERS);
+        env.events()
+            .publish((BEN_SWAPPED_TOPIC, vault_id), (a, b, bps_a, bps_b));
+        Ok(())
     }
 
     /// Creates a beneficiary pool from registered vault beneficiaries - Issue #529.
